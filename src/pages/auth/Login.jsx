@@ -195,7 +195,7 @@ const Login = () => {
             <Button
               type="submit"
               variant="primary"
-              size="lg"
+              size="sm"
               fullWidth
               loading={loading}
               icon={loading ? <Loader2 className="spin" /> : null}
@@ -214,28 +214,11 @@ const Login = () => {
               </Link>
             </p>
           </div>
-
-          {/* Demo Credentials (Development Only) */}
-          {import.meta.env.DEV && (
-            <div className="demo-credentials">
-              <p className="demo-title">Demo Credentials:</p>
-              <div className="demo-items">
-                <div className="demo-item">
-                  <strong>Driver:</strong>
-                  <span>driver@demo.com / password123</span>
-                </div>
-                <div className="demo-item">
-                  <strong>Admin:</strong>
-                  <span>admin@demo.com / password123</span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer */}
         <div className="auth-page-footer">
-          <p>&copy; 2024 ParkHub. All rights reserved.</p>
+          <p>&copy; 2026 ParkHub. All rights reserved.</p>
         </div>
       </div>
     </div>

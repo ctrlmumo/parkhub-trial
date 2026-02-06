@@ -142,7 +142,7 @@ const Register = () => {
             <Car size={32} strokeWidth={2.5} />
           </div>
           <h1 className="logo-text">ParkHub</h1>
-          <p className="logo-subtitle">Smart Parking Management</p>
+          <p className="logo-subtitle">Parking Allocation System</p>
         </div>
 
         {/* Register Card */}
@@ -150,7 +150,7 @@ const Register = () => {
           {/* Header */}
           <div className="auth-card-header">
             <h2>Create Account</h2>
-            <p>Join ParkHub for hassle-free parking</p>
+            <p>Get started with ParkHub</p>
           </div>
 
           {/* Role Selector Tabs */}
@@ -275,20 +275,11 @@ const Register = () => {
               required
             />
 
-            {/* Terms Checkbox */}
-            <div className="auth-checkbox">
-              <input type="checkbox" id="terms" required />
-              <label htmlFor="terms">
-                I agree to the <Link to="/terms">Terms & Conditions</Link> and{' '}
-                <Link to="/privacy">Privacy Policy</Link>
-              </label>
-            </div>
-
             {/* Submit Button */}
             <Button
               type="submit"
               variant="primary"
-              size="lg"
+              size="sm"
               fullWidth
               loading={loading}
               icon={loading ? <Loader2 className="spin" /> : null}

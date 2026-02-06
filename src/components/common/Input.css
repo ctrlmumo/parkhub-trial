@@ -9,7 +9,7 @@
    .input-group {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 1px;
     width: 100%;
   }
   
@@ -70,6 +70,7 @@
   .input {
     /* Box Model */
     width: 100%;
+    height: 40px;
     padding: var(--spacing-sm) var(--spacing-md);
     border: 2px solid var(--border);
     border-radius: var(--radius);
