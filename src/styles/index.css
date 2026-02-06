@@ -1,0 +1,492 @@
+/*foundation styles e.g reset(remove browser defaults), typography, colors, spacing*/
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+/* ParkHub Pastel Blue Theme */
+
+:root {
+  /* Background Colors */
+  --background: hsl(210, 40%, 98%);
+  --foreground: hsl(215, 25%, 15%);
+
+  /* Card Colors */
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(215, 25%, 15%);
+
+  /* Popover Colors */
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(215, 25%, 15%);
+
+  /* Primary Colors (Pastel Blue) */
+  --primary: hsl(211, 65%, 55%);
+  --primary-foreground: hsl(0, 0%, 100%);
+
+  /* Secondary Colors */
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(215, 25%, 25%);
+
+  /* Muted Colors */
+  --muted: hsl(210, 30%, 95%);
+  --muted-foreground: hsl(215, 15%, 50%);
+
+  /* Accent Colors */
+  --accent: hsl(211, 70%, 60%);
+  --accent-foreground: hsl(0, 0%, 100%);
+
+  /* Error Colors */
+  --destructive: hsl(0, 65%, 55%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  /* Border & Input */
+  --border: hsl(210, 25%, 90%);
+  --input: hsl(210, 25%, 90%);
+  --ring: hsl(211, 65%, 55%);
+
+  /* Border Radius */
+  --radius: 0.75rem;
+
+  /* Slot status colors */
+  --slot-available: hsl(142, 60%, 50%);
+  --slot-occupied: hsl(0, 65%, 55%);
+  --slot-reserved: hsl(38, 90%, 55%);
+  --slot-maintenance: hsl(215, 15%, 60%);
+
+  /* success & warning */
+  --success: hsl(142, 60%, 45%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(38, 90%, 55%);
+  --warning-foreground: hsl(0, 0%, 100%);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(211, 65%, 55%), hsl(211, 75%, 45%));
+  --gradient-hero: linear-gradient(135deg, hsl(211, 65%, 55%) 0%, hsl(220, 70%, 50%) 100%);
+  --gradient-success: linear-gradient(135deg, hsl(142, 60%, 50%), hsl(142, 65%, 40%));
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 hsla(215, 25%, 15%, 0.05);
+  --shadow-md: 0 4px 6px -1px hsla(215, 25%, 15%, 0.08), 0 2px 4px -2px hsla(215, 25%, 15%, 0.05);
+  --shadow-lg: 0 10px 15px -3px hsla(215, 25%, 15%, 0.08), 0 4px 6px -4px hsla(215, 25%, 15%, 0.05);
+  --shadow-xl: 0 20px 25px -5px hsla(215, 25%, 15%, 0.1), 0 8px 10px -6px hsla(215, 25%, 15%, 0.05);
+  --shadow-glow: 0 0 20px hsla(211, 65%, 55%, 0.3);
+
+  /* Sidebar Colors */
+  --sidebar-background: hsl(0, 0%, 98%);
+  --sidebar-foreground: hsl(240, 5.3%, 26.1%);
+  --sidebar-primary: hsl(240, 5.9%, 10%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(240, 4.8%, 95.9%);
+  --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
+  --sidebar-border: hsl(220, 13%, 91%);
+  --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms ease;
+  --transition-slow: 500ms ease;
+}
+
+/* Dark Mode Theme */
+.dark {
+  --background: hsl(215, 25%, 10%);
+  --foreground: hsl(210, 40%, 98%);
+  --card: hsl(215, 25%, 12%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --popover: hsl(215, 25%, 12%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --primary: hsl(211, 70%, 60%);
+  --primary-foreground: hsl(215, 25%, 10%);
+  --secondary: hsl(215, 25%, 18%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --muted: hsl(215, 25%, 18%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --accent: hsl(211, 70%, 60%);
+  --accent-foreground: hsl(215, 25%, 10%);
+  --destructive: hsl(0, 60%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(215, 25%, 20%);
+  --input: hsl(215, 25%, 20%);
+  --ring: hsl(211, 70%, 60%);
+  --sidebar-background: hsl(240, 5.9%, 10%);
+  --sidebar-foreground: hsl(240, 4.8%, 95.9%);
+  --sidebar-primary: hsl(224.3, 76.3%, 48%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(240, 3.7%, 15.9%);
+  --sidebar-accent-foreground: hsl(240, 4.8%, 95.9%);
+  --sidebar-border: hsl(240, 3.7%, 15.9%);
+  --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+}
+
+/* RESET & BASE STYLES */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--foreground);
+}
+
+h1 { font-size: var(--text-4xl); margin-bottom: var(--spacing-lg); }
+h2 { font-size: var(--text-3xl); margin-bottom: var(--spacing-md); }
+h3 { font-size: var(--text-2xl); margin-bottom: var(--spacing-md); }
+h4 { font-size: var(--text-xl); margin-bottom: var(--spacing-sm); }
+h5 { font-size: var(--text-lg); margin-bottom: var(--spacing-sm); }
+h6 { font-size: var(--text-base); margin-bottom: var(--spacing-sm); }
+
+p {
+  margin-bottom: var(--spacing-md);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* PARKING SLOT COMPONENTS */
+
+.parking-slot {
+  position: relative;
+  border-radius: var(--radius);
+  border: 2px solid;
+  transition: all var(--transition-base);
+  cursor: pointer;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+.parking-slot:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Available Slots - Green */
+.parking-slot-available {
+  background-color: hsl(142, 60%, 96%);
+  border-color: hsl(142, 60%, 50%);
+  color: hsl(142, 70%, 30%);
+}
+
+.parking-slot-available:hover {
+  background-color: hsl(142, 60%, 92%);
+  border-color: hsl(142, 70%, 45%);
+}
+
+/* Occupied Slots - Red */
+.parking-slot-occupied {
+  background-color: hsl(0, 65%, 96%);
+  border-color: hsl(0, 65%, 55%);
+  color: hsl(0, 70%, 35%);
+  cursor: not-allowed;
+}
+
+.parking-slot-occupied:hover {
+  transform: scale(1);
+}
+
+/* Reserved Slots - Amber */
+.parking-slot-reserved {
+  background-color: hsl(38, 90%, 96%);
+  border-color: hsl(38, 90%, 55%);
+  color: hsl(38, 95%, 30%);
+}
+
+/* Maintenance Slots - Gray */
+.parking-slot-maintenance {
+  background-color: hsl(215, 15%, 95%);
+  border-color: hsl(215, 15%, 60%);
+  color: hsl(215, 15%, 40%);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.parking-slot-maintenance:hover {
+  transform: scale(1);
+}
+
+/* UTILITY COMPONENTS */
+
+/* Glass Card Effect */
+.glass-card {
+  background-color: hsla(0, 0%, 100%, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid hsla(0, 0%, 100%, 0.2);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius);
+}
+
+/* Gradient Backgrounds */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-hero {
+  background: var(--gradient-hero);
+}
+
+.gradient-success {
+  background: var(--gradient-success);
+}
+
+/* Shadow Glow */
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* UTILITY CLASSES */
+
+/* Text Alignment */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Text Balance */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Flexbox Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.flex-wrap { flex-wrap: wrap; }
+.gap-xs { gap: var(--spacing-xs); }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+.gap-xl { gap: var(--spacing-xl); }
+
+/* Grid Utilities */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Spacing Utilities */
+.m-0 { margin: 0; }
+.m-xs { margin: var(--spacing-xs); }
+.m-sm { margin: var(--spacing-sm); }
+.m-md { margin: var(--spacing-md); }
+.m-lg { margin: var(--spacing-lg); }
+.m-xl { margin: var(--spacing-xl); }
+
+.mt-xs { margin-top: var(--spacing-xs); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+.mb-xs { margin-bottom: var(--spacing-xs); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+.p-0 { padding: 0; }
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+/* Width & Height */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+
+/* Border Radius */
+.rounded { border-radius: var(--radius); }
+.rounded-sm { border-radius: calc(var(--radius) * 0.5); }
+.rounded-lg { border-radius: calc(var(--radius) * 1.5); }
+.rounded-full { border-radius: 9999px; }
+
+/* Shadows */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* Background Colors */
+.bg-primary { background-color: var(--primary); }
+.bg-secondary { background-color: var(--secondary); }
+.bg-card { background-color: var(--card); }
+.bg-background { background-color: var(--background); }
+
+/* Text Colors */
+.text-primary { color: var(--primary); }
+.text-foreground { color: var(--foreground); }
+.text-muted { color: var(--muted-foreground); }
+.text-destructive { color: var(--destructive); }
+
+/* Font Sizes */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+
+/* Font Weights */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* CUSTOM SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(215, 15%, 50%, 0.3);
+  border-radius: 4px;
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(215, 15%, 50%, 0.5);
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsla(215, 15%, 50%, 0.3) var(--muted);
+}
+
+/* CONTAINER */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+}
+
+/* RESPONSIVENESS */
+
+@media (max-width: 768px) {
+  h1 { font-size: var(--text-3xl); }
+  h2 { font-size: var(--text-2xl); }
+  h3 { font-size: var(--text-xl); }
+}

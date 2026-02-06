@@ -1,0 +1,288 @@
+/**
+ * ParkHub - Card Component Styles
+ */
+
+/* =============================================================================
+   CARD BASE STYLES
+   ============================================================================= */
+
+   .card {
+    /* Box Model */
+    padding: var(--spacing-xl);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    
+    /* Visual */
+    background-color: var(--card);
+    box-shadow: var(--shadow-sm);
+    
+    /* Animation */
+    transition: all var(--transition-base);
+    
+    /* Reset for button variant */
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    cursor: default;
+  }
+  
+  /* =============================================================================
+     CARD VARIANTS
+     ============================================================================= */
+  
+  /* Default Variant - Standard card */
+  .card-default {
+    background-color: var(--card);
+  }
+  
+  /* Glass Variant - Frosted glass effect */
+  .card-glass {
+    background-color: hsla(0, 0%, 100%, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid hsla(0, 0%, 100%, 0.2);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  /* Gradient Variant - Subtle gradient background */
+  .card-gradient {
+    background: linear-gradient(135deg, var(--card) 0%, var(--secondary) 100%);
+    border: 1px solid var(--border);
+  }
+  
+  /* =============================================================================
+     CARD STATES
+     ============================================================================= */
+  
+  /* Hoverable Cards - Adds hover effect */
+  .card-hoverable:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+  
+  /* Clickable Cards - Cursor pointer and focus styles */
+  .card-clickable {
+    cursor: pointer;
+  }
+  
+  .card-clickable:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  
+  .card-clickable:active {
+    transform: translateY(-2px);
+  }
+  
+  /* =============================================================================
+     CARD HEADER
+     ============================================================================= */
+  
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  /* Header with actions (flex row) */
+  .card-header-with-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  /* =============================================================================
+     CARD TITLE
+     ============================================================================= */
+  
+  .card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--card-foreground);
+    margin: 0;
+  }
+  
+  /* =============================================================================
+     CARD DESCRIPTION
+     ============================================================================= */
+  
+  .card-description {
+    font-size: var(--text-sm);
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  /* =============================================================================
+     CARD CONTENT
+     ============================================================================= */
+  
+  .card-content {
+    /* Content area - flexible for different content types */
+    flex: 1;
+  }
+  
+  /* Add spacing between content and footer */
+  .card-content:has(~ .card-footer) {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* =============================================================================
+     CARD FOOTER
+     ============================================================================= */
+  
+  .card-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border);
+    margin-top: var(--spacing-lg);
+  }
+  
+  /* Footer with right-aligned actions */
+  .card-footer-actions {
+    justify-content: flex-end;
+  }
+  
+  /* Footer with space between items */
+  .card-footer-between {
+    justify-content: space-between;
+  }
+  
+  /* =============================================================================
+     CARD SIZES
+     ============================================================================= */
+  
+  /* Compact Card - Less padding */
+  .card-compact {
+    padding: var(--spacing-md);
+  }
+  
+  .card-compact .card-header {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+  }
+  
+  .card-compact .card-title {
+    font-size: var(--text-lg);
+  }
+  
+  /* Large Card - More padding */
+  .card-large {
+    padding: var(--spacing-2xl);
+  }
+  
+  .card-large .card-title {
+    font-size: var(--text-2xl);
+  }
+  
+  /* =============================================================================
+     SPECIAL CARD TYPES
+     ============================================================================= */
+  
+  /* Stat Card - For dashboard statistics */
+  .card-stat {
+    text-align: center;
+    padding: var(--spacing-xl);
+  }
+  
+  .card-stat .card-title {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .card-stat .card-description {
+    font-size: var(--text-base);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Feature Card - For features/benefits */
+  .card-feature {
+    text-align: center;
+    padding: var(--spacing-2xl);
+  }
+  
+  .card-feature:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  /* =============================================================================
+     CARD WITH MEDIA
+     ============================================================================= */
+  
+  /* Card with image/media */
+  .card-media {
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .card-media-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  
+  .card-media .card-content {
+    padding: var(--spacing-xl);
+  }
+  
+  /* =============================================================================
+     RESPONSIVE DESIGN
+     ============================================================================= */
+  
+  @media (max-width: 768px) {
+    /* Reduce padding on mobile */
+    .card {
+      padding: var(--spacing-lg);
+    }
+    
+    .card-large {
+      padding: var(--spacing-xl);
+    }
+    
+    .card-title {
+      font-size: var(--text-lg);
+    }
+    
+    .card-large .card-title {
+      font-size: var(--text-xl);
+    }
+    
+    /* Stack footer items on mobile */
+    .card-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .card-footer-between {
+      flex-direction: row;
+    }
+  }
+  
+  /* =============================================================================
+     DARK MODE SUPPORT
+     ============================================================================= */
+  
+  .dark .card {
+    background-color: var(--card);
+    border-color: var(--border);
+  }
+  
+  .dark .card-glass {
+    background-color: hsla(215, 25%, 12%, 0.8);
+    border-color: hsla(215, 25%, 20%, 0.5);
+  }
+  
+  .dark .card-gradient {
+    background: linear-gradient(135deg, var(--card) 0%, var(--secondary) 100%);
+  }
