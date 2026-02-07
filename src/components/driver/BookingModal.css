@@ -1,0 +1,439 @@
+/* MODAL OVERLAY */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* MODAL CONTAINER */
+
+.modal-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--card);
+  border-radius: calc(var(--radius) * 2);
+  box-shadow: var(--shadow-xl);
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close Button */
+.modal-close {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: 10;
+  padding: var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--secondary);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+/* PROGRESS STEPS */
+
+.modal-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    135deg,
+    var(--secondary) 0%,
+    var(--background) 100%
+  );
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex: 0 0 auto;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background-color: var(--background);
+  color: var(--muted-foreground);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transition: all var(--transition-base);
+}
+
+.step-active .step-circle {
+  background: var(--gradient-primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.step-label {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  font-weight: 600;
+  text-align: center;
+}
+
+.step-active .step-label {
+  color: var(--primary);
+}
+
+/* Step Line */
+.step-line {
+  flex: 1;
+  height: 2px;
+  background-color: var(--border);
+  transition: background-color var(--transition-base);
+}
+
+.step-line-active {
+  background: var(--gradient-primary);
+}
+
+/* MODAL CONTENT */
+
+.modal-content {
+  padding: var(--spacing-2xl);
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  animation: fade-slide 0.3s ease-out;
+}
+
+@keyframes fade-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* STEP HEADER */
+
+.step-header {
+  text-align: center;
+}
+
+.step-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  background: var(--gradient-primary);
+  color: var(--primary-foreground);
+}
+
+.step-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.step-subtitle {
+  font-size: var(--text-base);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* FORM GROUP */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* DURATION GRID */
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .duration-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.duration-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--background);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.duration-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.duration-card-active {
+  background: var(--gradient-primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.duration-hours {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.duration-card-active .duration-hours {
+  color: var(--primary-foreground);
+}
+
+.duration-price {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.duration-card-active .duration-price {
+  color: var(--primary-foreground);
+  opacity: 0.9;
+}
+
+/* BOOKING SUMMARY */
+
+.booking-summary {
+  padding: var(--spacing-lg);
+  background-color: var(--secondary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  font-size: var(--text-base);
+  color: var(--foreground);
+}
+
+.summary-row:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-total {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+/* PAYMENT CARD */
+
+.payment-card {
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  border-radius: var(--radius);
+  color: white;
+}
+
+.mpesa-logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-3xl);
+  font-weight: 900;
+  margin-bottom: var(--spacing-lg);
+  letter-spacing: 0.1em;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-base);
+}
+
+.payment-note {
+  font-size: var(--text-sm);
+  opacity: 0.9;
+  margin: 0;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* SUCCESS ANIMATION */
+
+.success-animation {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  color: var(--success);
+  animation: success-scale 0.6s ease-out;
+}
+
+@keyframes success-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* SUCCESS DETAILS */
+
+.success-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.success-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--gradient-primary);
+  border-radius: var(--radius);
+  color: var(--primary-foreground);
+}
+
+.badge-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+.badge-value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-4xl);
+  font-weight: 900;
+}
+
+.success-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background-color: var(--secondary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-base);
+  color: var(--foreground);
+}
+
+.success-note {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* MODAL ACTIONS */
+
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-lg);
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 640px) {
+  .modal-content {
+    padding: var(--spacing-xl);
+  }
+  
+  .step-label {
+    display: none;
+  }
+  
+  .duration-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

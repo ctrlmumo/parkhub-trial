@@ -523,3 +523,49 @@
       var(--muted) 100%
     );
   }
+
+  /* Add this to your Auth.css file at the bottom */
+
+/* =============================================================================
+   DEMO CREDENTIALS - CLICKABLE BUTTONS
+   ============================================================================= */
+
+.demo-button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-size: var(--text-xs);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.5);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.demo-button:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  transform: translateX(4px);
+}
+
+.demo-button strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.demo-button:hover strong {
+  color: var(--primary-foreground);
+}
+
+.demo-button span {
+  color: var(--muted-foreground);
+  font-family: 'Courier New', monospace;
+}
+
+.demo-button:hover span {
+  color: var(--primary-foreground);
+  opacity: 0.9;
+}

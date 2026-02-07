@@ -7,51 +7,36 @@ import { getFromStorage, saveToStorage, removeFromStorage } from '../utils/helpe
    CREATE CONTEXT
    ============================================================================ */
 
-/*Create the Auth Context - holds authentication state and functions*/
 const AuthContext = createContext(null);
 
 /* ============================================================================
    AUTH PROVIDER COMPONENT
    ============================================================================ */
 
-/*AuthProvider Component - wraps the entire app to provide authentication state to all components
- @param {ReactNode} children - Child components
- */
 export const AuthProvider = ({ children }) => {
   
-  /* ==========================================================================
-     STATE MANAGEMENT
-     ========================================================================== */
-  
-  /*Current user object - Contains: { id, username, email, is_admin, phone_number, vehicle_reg }*/
   const [user, setUser] = useState(null);
-  
-  /*Loading state during initial authentication check - prevents flash of login screen while checking if user is logged in*/
   const [loading, setLoading] = useState(true);
-  
-  /*Error message for authentication failures*/
   const [error, setError] = useState(null);
 
-  /*Initialization - Check if user is already logged in*/
-  
+  /**
+   * Initialize auth on mount
+   */
   useEffect(() => {
     const initializeAuth = () => {
       try {
-        /*Get stored user data from localStorage*/
         const storedUser = getFromStorage(STORAGE_KEYS.USER);
         const storedToken = getFromStorage(STORAGE_KEYS.TOKEN);
         
-        // If both user and token exist, restore the session
         if (storedUser && storedToken) {
+          console.log('Restored user session:', storedUser);
           setUser(storedUser);
-          setAuthToken(storedToken); // Set token in API headers
-          
-          // vERIFY TOKEN WITH BACKEND
-          // verifyToken();
+          setAuthToken(storedToken);
+        } else {
+          console.log('No existing session found');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        // If error, clear everything
         handleLogout();
       } finally {
         setLoading(false);
@@ -59,46 +44,100 @@ export const AuthProvider = ({ children }) => {
     };
     
     initializeAuth();
-  }, []); // Empty dependency array = run once on mount
+  }, []);
 
-  /*Authentication Functions*/
-
-  /*LOGIN FUNCTION - Authenticates user with email and password
-  @param {string} email - User's email
-  @param {string} password - User's password
-  @returns {Promise<object>} - { success: boolean, error?: string }
-  */
+  /**
+   * LOGIN FUNCTION - WITH MOCK FALLBACK
+   */
   const login = async (email, password) => {
     try {
       setLoading(true);
       setError(null);
       
-      // Call backend login endpoint
+      console.log('🔐 Login attempt:', { email });
+      
+      // ============================================================
+      // MOCK AUTHENTICATION (Remove when backend is ready)
+      // ============================================================
+      
+      // Check for demo credentials
+      const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
+      const isDemoAdmin = email === 'admin@demo.com' && password === 'password123';
+      
+      if (isDemoDriver || isDemoAdmin) {
+        console.log('✅ Using MOCK authentication');
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Create mock user data
+        const mockUser = {
+          id: isDemoDriver ? 1 : 2,
+          username: isDemoDriver ? 'Demo Driver' : 'Demo Admin',
+          email: email,
+          is_admin: isDemoAdmin,
+          phone_number: isDemoDriver ? '254712345678' : null,
+          vehicle_reg: isDemoDriver ? 'KCA 456B' : null
+        };
+        
+        const mockToken = `mock_token_${Date.now()}`;
+        
+        // Store authentication data
+        setAuthToken(mockToken);
+        saveToStorage(STORAGE_KEYS.TOKEN, mockToken);
+        saveToStorage(STORAGE_KEYS.USER, mockUser);
+        
+        // Update state
+        setUser(mockUser);
+        
+        console.log('✅ Mock login successful:', mockUser);
+        
+        return { 
+          success: true, 
+          message: SUCCESS_MESSAGES.LOGIN_SUCCESS 
+        };
+      }
+      
+      // ============================================================
+      // REAL API CALL (Uncomment when backend is ready)
+      // ============================================================
+      
+      /*
       const response = await api.post('/auth/login/', {
         email,
         password
       });
       
-      // Extract token and user data from response
       const { token, user: userData } = response.data;
       
       // Store token and user data
-      setAuthToken(token); // Set in API headers
-      saveToStorage(STORAGE_KEYS.TOKEN, token); // Save to localStorage
-      saveToStorage(STORAGE_KEYS.USER, userData); // Save user data
+      setAuthToken(token);
+      saveToStorage(STORAGE_KEYS.TOKEN, token);
+      saveToStorage(STORAGE_KEYS.USER, userData);
       
       // Update state
       setUser(userData);
+      
+      console.log('✅ Real API login successful:', userData);
       
       return { 
         success: true, 
         message: SUCCESS_MESSAGES.LOGIN_SUCCESS 
       };
+      */
+      
+      // If not demo credentials and backend not ready
+      const errorMessage = 'Invalid credentials. Try: driver@demo.com / password123';
+      setError(errorMessage);
+      
+      return { 
+        success: false, 
+        error: errorMessage 
+      };
       
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       
-      // Extract error message
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
                           ERROR_MESSAGES.LOGIN_FAILED;
@@ -116,27 +155,54 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * REGISTER FUNCTION
-   * 
-   * Creates a new user account
-   * 
-   * @param {object} userData - User registration data
-   * @param {string} userData.username - Full name
-   * @param {string} userData.email - Email address
-   * @param {string} userData.password - Password
-   * @param {string} [userData.phoneNumber] - Phone number (optional)
-   * @param {string} [userData.vehicleReg] - Vehicle registration (optional)
-   * @returns {Promise<object>} - { success: boolean, error?: string }
-   * 
-   * Usage:
-   * const { success } = await register({ username, email, password });
+   * REGISTER FUNCTION - WITH MOCK FALLBACK
    */
   const register = async (userData) => {
     try {
       setLoading(true);
       setError(null);
       
-      // Call backend register endpoint
+      console.log('📝 Register attempt:', { email: userData.email });
+      
+      // ============================================================
+      // MOCK REGISTRATION (Remove when backend is ready)
+      // ============================================================
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Create mock user
+      const mockUser = {
+        id: Date.now(),
+        username: userData.username,
+        email: userData.email,
+        is_admin: false,
+        phone_number: userData.phoneNumber || null,
+        vehicle_reg: userData.vehicleReg || null
+      };
+      
+      const mockToken = `mock_token_${Date.now()}`;
+      
+      // Store authentication data
+      setAuthToken(mockToken);
+      saveToStorage(STORAGE_KEYS.TOKEN, mockToken);
+      saveToStorage(STORAGE_KEYS.USER, mockUser);
+      
+      // Update state
+      setUser(mockUser);
+      
+      console.log('✅ Mock registration successful:', mockUser);
+      
+      return { 
+        success: true, 
+        message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS 
+      };
+      
+      // ============================================================
+      // REAL API CALL (Uncomment when backend is ready)
+      // ============================================================
+      
+      /*
       const response = await api.post('/auth/register/', {
         username: userData.username,
         email: userData.email,
@@ -145,10 +211,9 @@ export const AuthProvider = ({ children }) => {
         vehicle_reg: userData.vehicleReg || null
       });
       
-      // Extract token and user data from response
       const { token, user: newUser } = response.data;
       
-      // Store token and user data (same as login)
+      // Store token and user data
       setAuthToken(token);
       saveToStorage(STORAGE_KEYS.TOKEN, token);
       saveToStorage(STORAGE_KEYS.USER, newUser);
@@ -160,11 +225,11 @@ export const AuthProvider = ({ children }) => {
         success: true, 
         message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS 
       };
+      */
       
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       
-      // Extract error message
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
                           ERROR_MESSAGES.REGISTRATION_FAILED;
@@ -183,19 +248,13 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * LOGOUT FUNCTION
-   * 
-   * Logs out the current user and clears all authentication data
-   * 
-   * Usage:
-   * logout(); // User is logged out
    */
   const logout = async () => {
     try {
-      // Optional: Call backend logout endpoint
-      // await api.post('/auth/logout/');
+      console.log('👋 Logging out user');
       
       // Clear authentication data
-      clearAuth(); // Clears token from API headers
+      clearAuth();
       removeFromStorage(STORAGE_KEYS.TOKEN);
       removeFromStorage(STORAGE_KEYS.USER);
       
@@ -203,9 +262,11 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setError(null);
       
+      console.log('✅ Logout successful');
+      
     } catch (error) {
-      console.error('Logout error:', error);
-      // Even if backend call fails, still logout locally
+      console.error('❌ Logout error:', error);
+      // Even if error, still logout locally
       clearAuth();
       removeFromStorage(STORAGE_KEYS.TOKEN);
       removeFromStorage(STORAGE_KEYS.USER);
@@ -215,32 +276,22 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * UPDATE USER FUNCTION
-   * 
-   * Updates the current user's information
-   * 
-   * @param {object} updatedData - Updated user data
-   * @returns {Promise<object>} - { success: boolean, error?: string }
-   * 
-   * Usage:
-   * await updateUser({ phone_number: '254712345678' });
    */
   const updateUser = async (updatedData) => {
     try {
       setLoading(true);
       
-      // Call backend update endpoint
-      const response = await api.put('/auth/profile/', updatedData);
-      
-      const updatedUser = response.data.user;
-      
-      // Update stored user data
+      // For mock: just update local storage
+      const updatedUser = { ...user, ...updatedData };
       saveToStorage(STORAGE_KEYS.USER, updatedUser);
       setUser(updatedUser);
+      
+      console.log('✅ User updated:', updatedUser);
       
       return { success: true };
       
     } catch (error) {
-      console.error('Update user error:', error);
+      console.error('❌ Update user error:', error);
       
       const errorMessage = error.response?.data?.message || 
                           'Failed to update profile';
@@ -256,62 +307,36 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * VERIFY TOKEN FUNCTION (Optional)
-   * 
-   * Verifies that the stored token is still valid
-   * Useful to check on app load or after period of inactivity
-   * 
-   * @returns {Promise<boolean>} - True if token is valid
+   * VERIFY TOKEN FUNCTION
    */
   const verifyToken = async () => {
     try {
-      // Call backend verify endpoint
-      const response = await api.get('/auth/verify/');
-      
-      // Token is valid
-      return true;
+      // For mock: just check if token exists
+      const token = getFromStorage(STORAGE_KEYS.TOKEN);
+      return !!token;
       
     } catch (error) {
-      console.error('Token verification failed:', error);
-      
-      // Token is invalid - logout user
+      console.error('❌ Token verification failed:', error);
       logout();
       return false;
     }
   };
 
   /* ==========================================================================
-     COMPUTED VALUES (Derived from state)
+     COMPUTED VALUES
      ========================================================================== */
 
-  /**
-   * Check if user is authenticated
-   * @type {boolean}
-   */
-  const isAuthenticated = !!user; // Convert to boolean
-
-  /**
-   * Check if user is an admin
-   * @type {boolean}
-   */
+  const isAuthenticated = !!user;
   const isAdmin = user?.is_admin === true;
-
-  /**
-   * Check if user is a driver (regular user)
-   * @type {boolean}
-   */
   const isDriver = user?.is_admin === false;
-
-  /**
-   * Get user's role as string
-   * @type {string}
-   */
   const userRole = isAdmin ? USER_ROLES.ADMIN : USER_ROLES.DRIVER;
 
-  /*Context Value - what you get when you use useAuth()*/
+  /* ==========================================================================
+     CONTEXT VALUE
+     ========================================================================== */
 
   const value = {
-    // State - current user, loading state, error message
+    // State
     user,
     loading,
     error,
@@ -330,20 +355,10 @@ export const AuthProvider = ({ children }) => {
     verifyToken,
     
     // Utility
-    setError,          // Function to set error message
-    clearError: () => setError(null) // Function to clear error
+    setError,
+    clearError: () => setError(null)
   };
 
-  /* ==========================================================================
-     RENDER PROVIDER
-     ========================================================================== */
-
-  /**
-   * Render the provider with value
-   * 
-   * During initial loading, you might want to show a loading screen
-   * to prevent flash of unauthenticated content
-   */
   return (
     <AuthContext.Provider value={value}>
       {children}
@@ -352,30 +367,12 @@ export const AuthProvider = ({ children }) => {
 };
 
 /* ============================================================================
-   CUSTOM HOOK - useAuth()
+   CUSTOM HOOK
    ============================================================================ */
 
-/**
- * Custom hook to access Auth Context
- * 
- * This is the hook you'll use in components to access authentication state
- * 
- * @returns {object} - Auth context value
- * @throws {Error} - If used outside of AuthProvider
- * 
- * Usage in components:
- * 
- * const { user, isAuthenticated, login, logout } = useAuth();
- * 
- * if (isAuthenticated) {
- *   return <h1>Welcome {user.username}!</h1>
- * }
- */
 export const useAuth = () => {
-  // Get context value
   const context = useContext(AuthContext);
   
-  // Error if used outside provider
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
@@ -383,10 +380,4 @@ export const useAuth = () => {
   return context;
 };
 
-/*EXPORT THE HOOK FOR CONVENIENCE - Default export is the hook for convenience*/
-
-/*You can import either way:
-import { useAuth } from '@/context/AuthContext';
-or
-import useAuth from '@/context/AuthContext';*/
 export default useAuth;

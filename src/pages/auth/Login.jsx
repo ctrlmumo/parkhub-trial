@@ -9,7 +9,7 @@ import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, isAdmin } = useAuth();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -72,34 +72,63 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('Login form submitted');
+    
     // Validate
     if (!validateForm()) {
+      console.log('Validation failed');
       return;
     }
 
     setLoading(true);
+    setErrors({}); // Clear any previous errors
 
     try {
+      console.log('Attempting login...');
+      
       // Attempt login
       const { success, error } = await login(formData.email, formData.password);
 
+      console.log('Login response:', { success, error });
+
       if (success) {
-        // Success - redirect based on role
-        // In real app, role would come from backend
-        if (formData.role === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/driver/dashboard');
-        }
+        console.log('Login successful! Redirecting...');
+        
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          // Redirect based on selected role tab
+          // (In production, use the actual user role from backend)
+          if (formData.role === 'admin') {
+            console.log('Redirecting to admin dashboard');
+            navigate('/admin/dashboard', { replace: true });
+          } else {
+            console.log('Redirecting to driver dashboard');
+            navigate('/driver/dashboard', { replace: true });
+          }
+        }, 100);
+        
       } else {
         // Show error
+        console.log('Login failed:', error);
         setErrors({ submit: error || 'Login failed. Please try again.' });
       }
     } catch (error) {
+      console.error('Unexpected login error:', error);
       setErrors({ submit: 'An unexpected error occurred' });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Auto-fill demo credentials helper
+  const fillDemoCredentials = (role) => {
+    const email = role === 'admin' ? 'admin@demo.com' : 'driver@demo.com';
+    setFormData(prev => ({
+      ...prev,
+      email,
+      password: 'password123',
+      role
+    }));
   };
 
   return (
@@ -214,6 +243,34 @@ const Login = () => {
               </Link>
             </p>
           </div>
+
+          {/* Demo Credentials (Development Only) */}
+          {import.meta.env.DEV && (
+            <div className="demo-credentials">
+              <p className="demo-title">Quick Login (Demo):</p>
+              <div className="demo-items">
+                <button
+                  type="button"
+                  onClick={() => fillDemoCredentials('driver')}
+                  className="demo-button"
+                >
+                  <strong>Driver:</strong>
+                  <span>driver@demo.com / password123</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemoCredentials('admin')}
+                  className="demo-button"
+                >
+                  <strong>Admin:</strong>
+                  <span>admin@demo.com / password123</span>
+                </button>
+              </div>
+              <p style={{ fontSize: '11px', color: 'var(--muted-foreground)', marginTop: '8px', textAlign: 'center' }}>
+                ℹ️ Click to auto-fill credentials
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
