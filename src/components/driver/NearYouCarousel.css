@@ -1,0 +1,390 @@
+/* CAROUSEL SECTION */
+
+.near-you-carousel {
+  width: 100%;
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* SECTION HEADER */
+
+.carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.carousel-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.carousel-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.carousel-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.carousel-view-all {
+  /* Reset button */
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  /* Styling */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--primary);
+  
+  /* Animation */
+  transition: all var(--transition-fast);
+}
+
+.carousel-view-all:hover {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+/* CAROUSEL CONTAINER */
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+/* CAROUSEL ARROWS */
+
+.carousel-arrow {
+  /* Reset */
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  /* Position */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  
+  /* Size & Shape */
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  
+  /* Visual */
+  background-color: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--shadow-lg);
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Animation */
+  transition: all var(--transition-base);
+  opacity: 0.9;
+}
+
+.carousel-arrow:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Arrow Positions */
+.carousel-arrow-left {
+  left: -20px;
+}
+
+.carousel-arrow-right {
+  right: -20px;
+}
+
+/* Hide arrows on mobile */
+@media (max-width: 768px) {
+  .carousel-arrow {
+    display: none;
+  }
+}
+
+/* SCROLLABLE CONTAINER */
+
+.carousel-scroll {
+  display: flex;
+  gap: var(--spacing-lg);
+  overflow-x: auto;
+  overflow-y: hidden;
+  
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  
+  /* Padding for arrows */
+  padding: var(--spacing-sm) 0;
+}
+
+/* Hide scrollbar for Chrome/Safari */
+.carousel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* LOT CARD */
+
+.lot-card {
+  /* Size */
+  min-width: 280px;
+  width: 280px;
+  
+  /* Snap to grid */
+  scroll-snap-align: start;
+  
+  /* Visual */
+  background-color: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  
+  /* Animation */
+  transition: all var(--transition-base);
+  cursor: pointer;
+  
+  /* Prevent text selection while dragging */
+  user-select: none;
+}
+
+.lot-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
+}
+
+/* LOT IMAGE */
+
+.lot-card-image {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+}
+
+/* Placeholder gradient (replace with real images later) */
+.lot-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--accent) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-foreground);
+  opacity: 0.9;
+}
+
+/* Distance Badge */
+.lot-distance-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  padding: 4px 10px;
+  border-radius: 12px;
+  
+  background-color: hsla(0, 0%, 0%, 0.7);
+  backdrop-filter: blur(4px);
+  color: white;
+  
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.lot-distance-badge svg {
+  flex-shrink: 0;
+}
+
+/* LOT CARD CONTENT */
+
+.lot-card-content {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.lot-card-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+  
+  /* Truncate long names */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lot-card-location {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+  
+  /* Truncate */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* AVAILABILITY INDICATOR */
+
+.lot-card-availability {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.availability-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Availability Colors */
+.lot-card-availability.high {
+  color: hsl(142, 60%, 40%);
+}
+
+.lot-card-availability.high .availability-dot {
+  background-color: hsl(142, 60%, 50%);
+  box-shadow: 0 0 8px hsl(142, 60%, 50%);
+}
+
+.lot-card-availability.medium {
+  color: hsl(38, 90%, 45%);
+}
+
+.lot-card-availability.medium .availability-dot {
+  background-color: hsl(38, 90%, 55%);
+  box-shadow: 0 0 8px hsl(38, 90%, 55%);
+}
+
+.lot-card-availability.low {
+  color: hsl(0, 65%, 45%);
+}
+
+.lot-card-availability.low .availability-dot {
+  background-color: hsl(0, 65%, 55%);
+  box-shadow: 0 0 8px hsl(0, 65%, 55%);
+}
+
+/* PRICE */
+
+.lot-card-price {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* VIEW BUTTON */
+
+.lot-card-button {
+  /* Reset */
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  /* Styling */
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  border-radius: calc(var(--radius) * 0.75);
+  
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  
+  /* Animation */
+  transition: all var(--transition-base);
+}
+
+.lot-card-button:hover {
+  background-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Prevent button click from triggering card click */
+.lot-card-button:active {
+  transform: translateY(0);
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 768px) {
+  /* Smaller cards on mobile */
+  .lot-card {
+    min-width: 240px;
+    width: 240px;
+  }
+  
+  .lot-card-image {
+    height: 140px;
+  }
+  
+  .lot-card-content {
+    padding: var(--spacing-md);
+  }
+  
+  .carousel-title {
+    font-size: var(--text-xl);
+  }
+  
+  /* Add padding to scroll container on mobile */
+  .carousel-scroll {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+}
+
+/* DARK MODE SUPPORT */
+
+.dark .lot-card {
+  background-color: var(--card);
+  border-color: var(--border);
+}
+
+.dark .lot-card:hover {
+  border-color: var(--primary);
+}
+
+.dark .carousel-arrow {
+  background-color: var(--card);
+  color: var(--card-foreground);
+}

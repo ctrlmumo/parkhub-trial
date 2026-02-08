@@ -4,11 +4,14 @@ import { useState, useEffect } from 'react';
 import { MapPin, Clock, Car, Navigation, CircleCheck, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
-import ParkingGrid from '../../components/driver/ParkingGrid';
-import BookingModal from '../../components/driver/BookingModal';
+import BookAgainCarousel from '../../components/driver/BookAgainCarousel';
+import NearYouCarousel from '../../components/driver/NearYouCarousel';
+//import ParkingGrid from '../../components/driver/ParkingGrid';
+//import BookingModal from '../../components/driver/BookingModal';
 import './Dashboard.css';
 
 const DriverDashboard = () => {
@@ -16,8 +19,9 @@ const DriverDashboard = () => {
   
   // State
   const [activeBookings, setActiveBookings] = useState([]);
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const navigate = useNavigate();
+  //const [selectedSlot, setSelectedSlot] = useState(null);
+  //const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   /**
    * Load active bookings on mount
@@ -43,27 +47,60 @@ const DriverDashboard = () => {
     
     setActiveBookings(mockBookings);
   }, []);
+{/*
 
-  /**
-   * Handle slot selection
-   */
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
     setIsBookingModalOpen(true);
   };
 
-  /**
-   * Handle booking completion
-   */
+
   const handleBookingComplete = (booking) => {
     setActiveBookings(prev => [...prev, booking]);
     setIsBookingModalOpen(false);
     setSelectedSlot(null);
   };
+*/}
 
-  /**
-   * Open Google Maps navigation
-   */
+ // ✅ NEW: Handle lot card click - Navigate to lot detail page
+  const handleLotClick = (lotId) => {
+    console.log('🏢 Opening lot detail for:', lotId);
+    // TODO: Navigate to lot detail page
+    // navigate(`/driver/lot/${lotId}`);
+    alert(`Lot Detail page coming soon! Lot ID: ${lotId}`);
+  };
+
+  // ✅ NEW: Handle quick book click from Book Again carousel
+  const handleQuickBook = (slotId, lotId, isAvailable) => {
+    if (isAvailable) {
+      console.log('⚡ Quick booking slot:', slotId, 'at lot:', lotId);
+      // TODO: Open booking modal directly or navigate to lot detail
+      // navigate(`/driver/lot/${lotId}?slot=${slotId}&quickbook=true`);
+      alert(`Quick Book feature coming soon!\nSlot: ${slotId}\nLot: ${lotId}`);
+    } else {
+      console.log('❌ Slot occupied, viewing other slots at lot:', lotId);
+      // Navigate to lot detail to view other available slots
+      // navigate(`/driver/lot/${lotId}`);
+      alert(`Slot occupied! Showing other available slots...\nLot ID: ${lotId}`);
+    }
+  };
+
+  // ✅ NEW: Handle "See All" clicks
+  const handleViewAllLots = () => {
+    console.log('📋 Viewing all parking lots');
+    // TODO: Navigate to Find Parking page
+    // navigate('/driver/find-parking');
+    alert('Find Parking page coming next!');
+  };
+
+  const handleViewAllBookings = () => {
+    console.log('📅 Viewing all bookings');
+    // TODO: Navigate to My Bookings page
+    // navigate('/driver/bookings');
+    alert('My Bookings page coming soon!');
+  };
+
+  /* Open Google Maps navigation */
   const handleNavigate = (location) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`;
     window.open(url, '_blank');
@@ -83,7 +120,7 @@ const DriverDashboard = () => {
                 Welcome back, {user?.username || 'Driver'}!
               </h1>
               <p className="welcome-subtitle">
-                Find and book your parking spot in seconds
+                Where are you heading today?
               </p>
             </div>
             
@@ -139,15 +176,28 @@ const DriverDashboard = () => {
             </Card>
           )}
 
-          {/* Parking Grid Section */}
+          {/* BOOK AGAIN CAROUSEL */}
+        <BookAgainCarousel 
+          onSlotClick={handleQuickBook}
+          onViewAllClick={handleViewAllBookings}
+        />
+
+        {/* NEAR YOU CAROUSEL */}
+        <NearYouCarousel 
+          onLotClick={handleLotClick}
+          onViewAllClick={handleViewAllLots}
+        />
+
+          {/* Parking Grid Section 
           <div className="parking-section">
             <ParkingGrid onSlotSelect={handleSlotSelect} />
           </div>
+          */}
 
         </div>
       </div>
 
-      {/* Booking Modal */}
+      {/* Booking Modal 
       {isBookingModalOpen && (
         <BookingModal
           slot={selectedSlot}
@@ -158,7 +208,7 @@ const DriverDashboard = () => {
           }}
           onComplete={handleBookingComplete}
         />
-      )}
+      )}*/}
     </>
   );
 };
