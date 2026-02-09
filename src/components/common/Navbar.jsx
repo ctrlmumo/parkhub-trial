@@ -1,9 +1,4 @@
-/**
- * ParkHub - Navbar Component
- * 
- * Navigation bar for authenticated users
- * Shows different menu items based on user role (driver/admin)
- */
+/* Navigation bar for authenticated users based on user role (driver/admin) */
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Car, Home, Calendar, User, Settings, LogOut, Menu, X, LayoutDashboard, ParkingSquare, Users } from 'lucide-react';
@@ -17,34 +12,30 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  /**
-   * Handle logout
-   */
+  /* Handle logout */
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  /**
-   * Check if route is active
-   */
+  /* Close mobile menu */
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  /* Check if route is active */
   const isActive = (path) => {
     return location.pathname === path;
   };
 
-  /**
-   * Driver Navigation Items
-   */
+  /* Driver Navigation Items */
   const driverNavItems = [
     { path: '/driver/dashboard', label: 'Dashboard', icon: <Home size={18} /> },
-    { path: '/driver/find-parking', label: 'Find Parking', icon: <ParkingSquare size={18} /> },
-    { path: '/driver/bookings', label: 'My Bookings', icon: <Calendar size={18} /> },
+    //{ path: '/driver/bookings', label: 'My Bookings', icon: <Calendar size={18} /> },
     { path: '/driver/profile', label: 'Profile', icon: <User size={18} /> },
   ];
 
-  /**
-   * Admin Navigation Items
-   */
+  /* Admin Navigation Items */
   const adminNavItems = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { path: '/admin/lots', label: 'Parking Lots', icon: <ParkingSquare size={18} /> },
@@ -52,9 +43,7 @@ const Navbar = () => {
     { path: '/admin/users', label: 'Users', icon: <Users size={18} /> },
   ];
 
-  /**
-   * Get navigation items based on role
-   */
+  /* Get navigation items based on role */
   const navItems = isAdmin ? adminNavItems : driverNavItems;
 
   return (
