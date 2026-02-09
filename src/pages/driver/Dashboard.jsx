@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import DashboardSearchBar from '../../components/driver/Dashboardsearchbar';
 import BookAgainCarousel from '../../components/driver/BookAgainCarousel';
 import NearYouCarousel from '../../components/driver/NearYouCarousel';
 //import ParkingGrid from '../../components/driver/ParkingGrid';
@@ -129,6 +130,9 @@ const DriverDashboard = () => {
               <span>ParkHub Central - Nairobi</span>
             </div>
           </div>
+
+          {/* Search Bar */}
+          <DashboardSearchBar />
 
           {/* Active Bookings Card */}
           {activeBookings.length > 0 && (
