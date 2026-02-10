@@ -3,6 +3,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import GoogleMap from './components/driver/GoogleMap';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -10,6 +11,8 @@ import Register from './pages/auth/Register';
 
 // Placeholder pages (to be built)
 import DriverDashboard from './pages/driver/Dashboard';
+import FindParking from './pages/driver/FindParking';
+
 const AdminDashboard = () => <div className="p-xl"><h1>Admin Dashboard</h1><p>Coming soon...</p></div>;
 
 
@@ -73,6 +76,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <DriverDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*Find Parking*/}
+          <Route
+            path="/driver/find-parking"
+            element={
+              <ProtectedRoute>
+                <FindParking />
               </ProtectedRoute>
             }
           />

@@ -90,7 +90,6 @@ const DashboardSearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
-          onClick={handleSearchClick}
         />
         
         {/* Filter Toggle Button */}
