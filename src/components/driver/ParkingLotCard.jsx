@@ -68,7 +68,7 @@ const ParkingLotCard = ({
       className={`parking-lot-card ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
       onMouseEnter={() => onHover(lot.id)}
       onMouseLeave={onLeave}
-      onClick={() => onClick(lot.id)}
+      onClick={() => navigate(`/driver/lot/${lot.id}`)}
     >
       {/* Header: Category Badge */}
       <div className="lot-card-header">

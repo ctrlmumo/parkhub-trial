@@ -11,7 +11,7 @@ import Button from '../../components/common/Button';
 import DashboardSearchBar from '../../components/driver/Dashboardsearchbar';
 import BookAgainCarousel from '../../components/driver/BookAgainCarousel';
 import NearYouCarousel from '../../components/driver/NearYouCarousel';
-//import ParkingGrid from '../../components/driver/ParkingGrid';
+import ParkingGrid from '../../components/driver/ParkingGrid';
 //import BookingModal from '../../components/driver/BookingModal';
 import './Dashboard.css';
 
@@ -63,39 +63,31 @@ const DriverDashboard = () => {
   };
 */}
 
- // ✅ NEW: Handle lot card click - Navigate to lot detail page
+ // Navigate to lot detail page
   const handleLotClick = (lotId) => {
-    console.log('🏢 Opening lot detail for:', lotId);
-    // TODO: Navigate to lot detail page
-    // navigate(`/driver/lot/${lotId}`);
-    alert(`Lot Detail page coming soon! Lot ID: ${lotId}`);
+    console.log('Opening lot detail for:', lotId);
+    navigate(`/driver/lot/${lotId}`);
   };
 
-  // ✅ NEW: Handle quick book click from Book Again carousel
+  // Navigate to lot detail page with quick book
   const handleQuickBook = (slotId, lotId, isAvailable) => {
     if (isAvailable) {
       console.log('⚡ Quick booking slot:', slotId, 'at lot:', lotId);
-      // TODO: Open booking modal directly or navigate to lot detail
-      // navigate(`/driver/lot/${lotId}?slot=${slotId}&quickbook=true`);
-      alert(`Quick Book feature coming soon!\nSlot: ${slotId}\nLot: ${lotId}`);
+      navigate(`/driver/lot/${lotId}?slot=${slotId}&quickbook=true`);
     } else {
-      console.log('❌ Slot occupied, viewing other slots at lot:', lotId);
-      // Navigate to lot detail to view other available slots
-      // navigate(`/driver/lot/${lotId}`);
-      alert(`Slot occupied! Showing other available slots...\nLot ID: ${lotId}`);
+      console.log('Slot occupied, viewing other slots at lot:', lotId);
+      navigate(`/driver/lot/${lotId}`);
     }
   };
 
-  // ✅ NEW: Handle "See All" clicks
+  // Handle "See All" clicks
   const handleViewAllLots = () => {
-    console.log('📋 Viewing all parking lots');
-    // TODO: Navigate to Find Parking page
-    // navigate('/driver/find-parking');
-    alert('Find Parking page coming next!');
+    console.log('Viewing all parking lots');
+    navigate('/driver/find-parking');
   };
 
   const handleViewAllBookings = () => {
-    console.log('📅 Viewing all bookings');
+    console.log('Viewing all bookings');
     // TODO: Navigate to My Bookings page
     // navigate('/driver/bookings');
     alert('My Bookings page coming soon!');
