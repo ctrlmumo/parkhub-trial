@@ -53,7 +53,7 @@ const LotDetail = () => {
         location: "University Way, Nairobi",
         address: "123 University Way, Nairobi, Kenya",
         coordinates: { lat: -1.2921, lng: 36.8219 },
-        distance: 0.8, // km from user
+        distance: 0.8, // km 
         rating: 4.5,
         reviews: 127,
         hours: "24/7",
@@ -72,7 +72,7 @@ const LotDetail = () => {
           monthly: 8000
         },
         totalSlots: 80,
-        description: "Premium parking facility with state-of-the-art security and amenities. Conveniently located near the main campus entrance with easy access to all university buildings."
+        description: " "
       };
       
       setLot(mockLot);
@@ -257,13 +257,12 @@ const LotDetail = () => {
       </div>
 
       {/* BOOKING MODAL */}
-      {showBookingModal && selectedSlot && (
-        <BookingModal
-          slot={selectedSlot}
-          onClose={handleCloseModal}
-          onComplete={handleBookingComplete}
-        />
-      )}
+      <BookingModal
+        slot={selectedSlot}
+        isOpen={showBookingModal}
+        onClose={handleCloseModal}
+        onComplete={handleBookingComplete}
+      />
     </div>
   );
 };
