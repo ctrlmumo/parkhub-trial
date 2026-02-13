@@ -1,19 +1,3 @@
-/**
- * ParkHub - Input Component
- * 
- * A reusable input component with labels, error messages, and icons.
- * Supports various input types and validation states.
- * 
- * Usage:
- * <Input
- *   label="Email"
- *   type="email"
- *   value={email}
- *   onChange={(e) => setEmail(e.target.value)}
- *   error="Invalid email"
- * />
- */
-
 import './Input.css';
 
 /**
@@ -55,15 +39,12 @@ const Input = ({
   ...rest // Spread remaining props
 }) => {
   
-  /**
-   * Generate unique ID if not provided
+  /* Generate unique ID if not provided
    * Used to link label with input for accessibility
    */
   const inputId = id || `input-${name || Math.random().toString(36).substr(2, 9)}`;
   
-  /**
-   * Build input wrapper classes based on state
-   */
+  /* Build input wrapper classes based on state */
   const wrapperClasses = [
     'input-wrapper',
     error ? 'input-wrapper-error' : '',
@@ -73,9 +54,7 @@ const Input = ({
     .filter(Boolean)
     .join(' ');
   
-  /**
-   * Build input classes
-   */
+  /* Build input classes */
   const inputClasses = [
     'input',
     error ? 'input-error' : '',

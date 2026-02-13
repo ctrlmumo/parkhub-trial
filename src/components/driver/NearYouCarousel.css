@@ -132,7 +132,7 @@
   
   /* Hide scrollbar but keep functionality */
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  -ms-overflow-style: none; /* Edge */
   
   /* Padding for arrows */
   padding: var(--spacing-sm) 0;
@@ -168,7 +168,6 @@
 }
 
 .lot-card:hover {
-  transform: translateY(-8px);
   box-shadow: var(--shadow-xl);
   border-color: var(--primary);
 }
@@ -182,7 +181,7 @@
   overflow: hidden;
 }
 
-/* Placeholder gradient (replace with real images later) */
+/* Placeholder to replace with real images later */
 .lot-image-placeholder {
   width: 100%;
   height: 100%;

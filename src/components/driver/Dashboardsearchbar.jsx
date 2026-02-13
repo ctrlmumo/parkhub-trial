@@ -86,7 +86,7 @@ const DashboardSearchBar = () => {
         <input
           type="text"
           className="search-input"
-          placeholder="Find Parking - Search by location, name, or address..."
+          placeholder="Search by location, name or address..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}

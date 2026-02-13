@@ -1,4 +1,4 @@
-/* Constant values used throughout the application e.g. API endpoints, error messages*/
+/* Constant values used throughout the application such as API endpoints, error messages*/
 
 /* Parking slot status constants */
 export const SLOT_STATUS = {
@@ -33,9 +33,9 @@ export const SLOT_STATUS = {
   
   /*Reservation status*/
   export const BOOKING_STATUS = {
-    ACTIVE: 'active',       // Booking is current and valid
-    CANCELLED: 'cancelled', // Booking was cancelled by user
-    COMPLETED: 'completed'  // Booking time has ended
+    ACTIVE: 'active',       
+    CANCELLED: 'cancelled', 
+    COMPLETED: 'completed'
   };
   
   /*Payment status*/
@@ -65,14 +65,10 @@ export const SLOT_STATUS = {
     { value: 24, label: '24 hours' }
   ];
   
-  /* ============================================================================
-     API ENDPOINTS (Optional - can also be in services) - WILL EDIT LATER TO MATCH BACKEND
-     ============================================================================ */
+  /* API ENDPOINTS WHICH WILL EDIT LATER TO MATCH BACKEND  */
   
   /**
-   * Base API endpoints
-   * Note: Full URLs are constructed in services/api.js
-   */
+   * Base API endpoints - full URLs are constructed in services/api.js  */
   export const API_ENDPOINTS = {
     // Authentication
     LOGIN: '/auth/login/',
@@ -156,7 +152,7 @@ export const SLOT_STATUS = {
   /*Regex patterns for validation*/
   export const REGEX_PATTERNS = {
     EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    PHONE_KENYA: /^254[17]\d{8}$/,  // Kenyan phone format: 2547XXXXXXXX or 2541XXXXXXXX
+    PHONE_KENYA: /^[0][17]\d{8}$/,  // Kenyan phone format: 07XXXXXXXX or 01XXXXXXXX
     VEHICLE_REG: /^K[A-Z]{2}\s?\d{3}[A-Z]$/  // Kenyan format: KAA 123A
   };
   
@@ -201,14 +197,9 @@ export const SLOT_STATUS = {
     SLOT_UPDATED: 'Slot status updated successfully.'
   };
   
-  /* ============================================================================
-     LOCAL STORAGE KEYS
-     ============================================================================ */
+  /* LOCAL STORAGE KEYS */
   
-  /**
-   * Keys for localStorage
-   * Prevents typos and makes it easy to change keys later
-   */
+  /* Keys for localStorage to prevent typos and makes it easy to change keys later */
   export const STORAGE_KEYS = {
     TOKEN: 'parkhub_token',
     USER: 'parkhub_user',

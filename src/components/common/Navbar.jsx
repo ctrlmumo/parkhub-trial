@@ -1,4 +1,4 @@
-/* Navigation bar for authenticated users based on user role (driver/admin) */
+/* Navigation bar for authenticated users based on user role */
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Car, Home, Calendar, User, Settings, LogOut, Menu, X, LayoutDashboard, ParkingSquare, Users } from 'lucide-react';

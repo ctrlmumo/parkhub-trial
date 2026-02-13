@@ -5,7 +5,7 @@
   margin-bottom: var(--spacing-2xl);
 }
 
-/* Note: Header and arrow styles are inherited from NearYouCarousel.css */
+/* Header and arrow styles are inherited from NearYouCarousel.css */
 
 /* SLOT CARD */
 
@@ -32,7 +32,6 @@
 }
 
 .slot-card:hover {
-  transform: translateY(-8px);
   box-shadow: var(--shadow-xl);
   border-color: var(--primary);
 }

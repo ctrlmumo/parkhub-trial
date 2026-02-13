@@ -3,15 +3,11 @@ import api, { setAuthToken, clearAuth } from '../services/api';
 import { STORAGE_KEYS, USER_ROLES, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/constants';
 import { getFromStorage, saveToStorage, removeFromStorage } from '../utils/helpers';
 
-/* ============================================================================
-   CREATE CONTEXT
-   ============================================================================ */
+/* CREATE CONTEXT */
 
 const AuthContext = createContext(null);
 
-/* ============================================================================
-   AUTH PROVIDER COMPONENT
-   ============================================================================ */
+/* AUTH PROVIDER COMPONENT */
 
 export const AuthProvider = ({ children }) => {
   
@@ -19,9 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  /**
-   * Initialize auth on mount
-   */
+  /* Initialize auth on mount */
   useEffect(() => {
     const initializeAuth = () => {
       try {
@@ -46,9 +40,7 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  /**
-   * LOGIN FUNCTION - WITH MOCK FALLBACK
-   */
+  /* LOGIN FUNCTION - WITH MOCK FALLBACK */
   const login = async (email, password) => {
     try {
       setLoading(true);
@@ -56,10 +48,7 @@ export const AuthProvider = ({ children }) => {
       
       console.log('🔐 Login attempt:', { email });
       
-      // ============================================================
-      // MOCK AUTHENTICATION (Remove when backend is ready)
-      // ============================================================
-      
+      // MOCK AUTHENTICATION (Remove when backend is ready)     
       // Check for demo credentials
       const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
       const isDemoAdmin = email === 'admin@demo.com' && password === 'password123';
@@ -98,9 +87,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
       
-      // ============================================================
       // REAL API CALL (Uncomment when backend is ready)
-      // ============================================================
       
       /*
       const response = await api.post('/auth/login/', {
@@ -118,7 +105,7 @@ export const AuthProvider = ({ children }) => {
       // Update state
       setUser(userData);
       
-      console.log('✅ Real API login successful:', userData);
+      console.log('Real API login successful:', userData);
       
       return { 
         success: true, 
@@ -136,7 +123,7 @@ export const AuthProvider = ({ children }) => {
       };
       
     } catch (error) {
-      console.error('❌ Login error:', error);
+      console.error('Login error:', error);
       
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
@@ -154,9 +141,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * REGISTER FUNCTION - WITH MOCK FALLBACK
-   */
+  /* REGISTER FUNCTION - WITH MOCK FALLBACK */
   const register = async (userData) => {
     try {
       setLoading(true);
@@ -164,9 +149,7 @@ export const AuthProvider = ({ children }) => {
       
       console.log('📝 Register attempt:', { email: userData.email });
       
-      // ============================================================
       // MOCK REGISTRATION (Remove when backend is ready)
-      // ============================================================
       
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -228,7 +211,7 @@ export const AuthProvider = ({ children }) => {
       */
       
     } catch (error) {
-      console.error('❌ Registration error:', error);
+      console.error(' Registration error:', error);
       
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
@@ -262,10 +245,10 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setError(null);
       
-      console.log('✅ Logout successful');
+      console.log('Logout successful');
       
     } catch (error) {
-      console.error('❌ Logout error:', error);
+      console.error('Logout error:', error);
       // Even if error, still logout locally
       clearAuth();
       removeFromStorage(STORAGE_KEYS.TOKEN);
@@ -274,9 +257,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * UPDATE USER FUNCTION
-   */
+  /* UPDATE USER FUNCTION */
   const updateUser = async (updatedData) => {
     try {
       setLoading(true);
@@ -306,9 +287,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * VERIFY TOKEN FUNCTION
-   */
+  /* VERIFY TOKEN FUNCTION */
   const verifyToken = async () => {
     try {
       // For mock: just check if token exists
@@ -316,24 +295,20 @@ export const AuthProvider = ({ children }) => {
       return !!token;
       
     } catch (error) {
-      console.error('❌ Token verification failed:', error);
+      console.error('Token verification failed:', error);
       logout();
       return false;
     }
   };
 
-  /* ==========================================================================
-     COMPUTED VALUES
-     ========================================================================== */
+  /* COMPUTED VALUES */
 
   const isAuthenticated = !!user;
   const isAdmin = user?.is_admin === true;
   const isDriver = user?.is_admin === false;
   const userRole = isAdmin ? USER_ROLES.ADMIN : USER_ROLES.DRIVER;
 
-  /* ==========================================================================
-     CONTEXT VALUE
-     ========================================================================== */
+  /* CONTEXT VALUE */
 
   const value = {
     // State
@@ -366,9 +341,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/* ============================================================================
-   CUSTOM HOOK
-   ============================================================================ */
+/* CUSTOM HOOK */
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

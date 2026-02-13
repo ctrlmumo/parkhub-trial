@@ -13,10 +13,7 @@ import LotDetail from './pages/driver/LotDetail';
 const AdminDashboard = () => <div className="p-xl"><h1>Admin Dashboard</h1><p>Coming soon...</p></div>;
 
 
-/**
- * Public Route Component
- * Redirects to dashboard if already logged in
- */
+/* Redirects to dashboard if already logged in */
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 

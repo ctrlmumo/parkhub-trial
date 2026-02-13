@@ -1,15 +1,3 @@
-/**
- * ParkHub - Button Component
- * 
- * A reusable button component with multiple variants and sizes.
- * Handles loading states, disabled states, and icons.
- * 
- * Usage:
- * <Button variant="primary" size="md" onClick={handleClick}>
- *   Click Me
- * </Button>
- */
-
 import './Button.css';
 
 /**
@@ -43,10 +31,7 @@ const Button = ({
   ...rest // Spread remaining props (e.g., id, data-*, aria-*)
 }) => {
   
-  /**
-   * Build CSS classes based on props
-   * Combines base class with variant, size, and state classes
-   */
+  /* Build CSS classes based on props */
   const buttonClasses = [
     'btn', // Base class
     `btn-${variant}`, // Variant class (btn-primary, btn-secondary, etc.)
@@ -58,10 +43,7 @@ const Button = ({
     .filter(Boolean) // Remove empty strings
     .join(' '); // Join with spaces
 
-  /**
-   * Handle button click
-   * Prevents click when loading or disabled
-   */
+  /* Handle button click to prevent click when loading or disabled */
   const handleClick = (e) => {
     if (loading || disabled) {
       e.preventDefault();

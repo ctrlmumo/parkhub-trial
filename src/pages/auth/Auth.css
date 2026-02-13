@@ -1,11 +1,4 @@
-/**
- * ParkHub - Authentication Pages Styles
- * Beautiful, modern login and register pages
- */
-
-/* =============================================================================
-   PAGE CONTAINER
-   ============================================================================= */
+/* PAGE CONTAINER */
 
    .auth-page {
     min-height: 100vh;
@@ -17,7 +10,7 @@
     overflow: hidden;
     
     /* Fade-in animation on page load */
-    animation: fadeIn 0.6s ease-out;
+    /*animation: fadeIn 0.6s ease-out;*/
   }
   
   @keyframes fadeIn {
@@ -83,7 +76,7 @@
     gap: var(--spacing-xl);
     
     /* Slide-up animation */
-    animation: slideUp 0.6s ease-out;
+    /*animation: slideUp 0.6s ease-out;*/
   }
   
   @keyframes slideUp {
@@ -97,9 +90,7 @@
     }
   }
   
-  /* =============================================================================
-     LOGO SECTION
-     ============================================================================= */
+  /* LOGO SECTION */
   
   .auth-logo {
     text-align: center;
@@ -123,9 +114,6 @@
     /* Visual polish */
     color: var(--primary-foreground);
     box-shadow: var(--shadow-glow);
-    
-    /* Pulse animation */
-    animation: pulse-glow 3s ease-in-out infinite;
   }
   
   @keyframes pulse-glow {
@@ -155,9 +143,7 @@
     margin: 0;
   }
   
-  /* =============================================================================
-     AUTH CARD
-     ============================================================================= */
+  /* AUTH CARD */
   
   .auth-card {
     background: var(--card);
@@ -168,8 +154,6 @@
     border: none;
     box-shadow: var(--shadow-xl);
     
-    /* Subtle fade-in */
-    animation: fadeIn 0.8s ease-out 0.2s both;
   }
   
   /* Card Header */
@@ -191,9 +175,7 @@
     margin: 0;
   }
   
-  /* =============================================================================
-     ROLE SELECTOR TABS
-     ============================================================================= */
+  /* ROLE SELECTOR TABS */
   
   .role-tabs {
     display: grid;
@@ -246,9 +228,7 @@
     flex-shrink: 0;
   }
   
-  /* =============================================================================
-     FORM
-     ============================================================================= */
+  /* FORM */
   
   .auth-form {
     display: flex;
@@ -352,9 +332,7 @@
     }
   }
   
-  /* =============================================================================
-     FOOTER
-     ============================================================================= */
+  /* FOOTER */
   
   .auth-footer {
     text-align: center;
@@ -381,9 +359,7 @@
     text-decoration: underline;
   }
   
-  /* =============================================================================
-     DEMO CREDENTIALS (Dev Only)
-     ============================================================================= */
+  /* DEMO CREDENTIALS (Dev Only) */
   
   .demo-credentials {
     margin-top: var(--spacing-xl);
@@ -433,9 +409,7 @@
     display: inline-block;
   }
   
-  /* =============================================================================
-     PAGE FOOTER
-     ============================================================================= */
+  /* PAGE FOOTER */
   
   .auth-page-footer {
     text-align: center;
@@ -448,9 +422,7 @@
     margin: 0;
   }
   
-  /* =============================================================================
-     RESPONSIVE DESIGN
-     ============================================================================= */
+  /* RESPONSIVE DESIGN */
   
   @media (max-width: 480px) {
     .auth-page {
@@ -496,9 +468,7 @@
     }
   }
   
-  /* =============================================================================
-     DARK MODE SUPPORT
-     ============================================================================= */
+  /* DARK MODE SUPPORT */
   
   .dark .auth-background {
     background: linear-gradient(
@@ -524,11 +494,7 @@
     );
   }
 
-  /* Add this to your Auth.css file at the bottom */
-
-/* =============================================================================
-   DEMO CREDENTIALS - CLICKABLE BUTTONS
-   ============================================================================= */
+  /* DEMO CREDENTIALS - CLICKABLE BUTTONS */
 
 .demo-button {
   display: flex;

@@ -26,9 +26,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  /**
-   * Handle input changes
-   */
+  /* Handle input changes */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -39,16 +37,12 @@ const Register = () => {
     }
   };
 
-  /**
-   * Handle role tab selection
-   */
+  /* Handle role tab selection */
   const handleRoleChange = (role) => {
     setFormData(prev => ({ ...prev, role }));
   };
 
-  /**
-   * Validate form
-   */
+  /* Validate form */
   const validateForm = () => {
     const newErrors = {};
 
@@ -66,7 +60,7 @@ const Register = () => {
       newErrors.email = 'Please enter a valid email';
     }
 
-    // Phone validation (optional but validated if provided)
+    // Phone validation
     if (formData.phoneNumber && !isValidPhone(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Please enter a valid phone (254XXXXXXXXX)';
     }

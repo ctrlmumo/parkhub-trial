@@ -1,5 +1,3 @@
-/* Usage: <NearYouCarousel onLotClick={(lotId) => openLotDetail(lotId)} />  */
-
 import { useState } from 'react';
 import { MapPin, ChevronLeft, ChevronRight, Navigation } from 'lucide-react';
 import './NearYouCarousel.css';
@@ -22,7 +20,7 @@ const NearYouCarousel = ({ onLotClick, onViewAllClick }) => {
     {
       id: 1,
       name: 'Main Campus Lot',
-      location: 'University Way',
+      location: 'Catholic University of Eastern Africa',
       distance: 0.8, // km
       available: 24,
       total: 80,
@@ -44,7 +42,7 @@ const NearYouCarousel = ({ onLotClick, onViewAllClick }) => {
     {
       id: 3,
       name: 'Staff Lot',
-      location: 'Administration Wing',
+      location: 'Administration Block',
       distance: 1.5,
       available: 8,
       total: 30,
@@ -55,7 +53,7 @@ const NearYouCarousel = ({ onLotClick, onViewAllClick }) => {
     {
       id: 4,
       name: 'Downtown Plaza',
-      location: 'City Center',
+      location: 'Afya Center',
       distance: 2.1,
       available: 45,
       total: 100,
@@ -65,7 +63,7 @@ const NearYouCarousel = ({ onLotClick, onViewAllClick }) => {
     },
     {
       id: 5,
-      name: 'Shopping Mall',
+      name: 'Sarit Center',
       location: 'Westlands',
       distance: 3.5,
       available: 67,
@@ -77,7 +75,7 @@ const NearYouCarousel = ({ onLotClick, onViewAllClick }) => {
     {
       id: 6,
       name: 'Hospital Parking',
-      location: 'Medical Center',
+      location: 'Karen Hospital',
       distance: 4.2,
       available: 12,
       total: 50,
