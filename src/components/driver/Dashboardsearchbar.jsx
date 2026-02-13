@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search, MapPin, DollarSign, SlidersHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './DashboardSearchBar.css';
+import './Dashboardsearchbar.css';
 
 const DashboardSearchBar = () => {
   const navigate = useNavigate();

@@ -12,7 +12,7 @@ import DashboardSearchBar from '../../components/driver/Dashboardsearchbar';
 import BookAgainCarousel from '../../components/driver/BookAgainCarousel';
 import NearYouCarousel from '../../components/driver/NearYouCarousel';
 import ParkingGrid from '../../components/driver/ParkingGrid';
-//import BookingModal from '../../components/driver/BookingModal';
+import BookingModal from '../../components/driver/BookingModal';
 import './Dashboard.css';
 
 const DriverDashboard = () => {
@@ -21,8 +21,8 @@ const DriverDashboard = () => {
   // State
   const [activeBookings, setActiveBookings] = useState([]);
   const navigate = useNavigate();
-  //const [selectedSlot, setSelectedSlot] = useState(null);
-  //const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   /**
    * Load active bookings on mount
@@ -48,7 +48,7 @@ const DriverDashboard = () => {
     
     setActiveBookings(mockBookings);
   }, []);
-{/*
+{
 
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
@@ -61,7 +61,7 @@ const DriverDashboard = () => {
     setIsBookingModalOpen(false);
     setSelectedSlot(null);
   };
-*/}
+}
 
  // Navigate to lot detail page
   const handleLotClick = (lotId) => {
@@ -72,7 +72,7 @@ const DriverDashboard = () => {
   // Navigate to lot detail page with quick book
   const handleQuickBook = (slotId, lotId, isAvailable) => {
     if (isAvailable) {
-      console.log('⚡ Quick booking slot:', slotId, 'at lot:', lotId);
+      console.log('Quick booking slot:', slotId, 'at lot:', lotId);
       navigate(`/driver/lot/${lotId}?slot=${slotId}&quickbook=true`);
     } else {
       console.log('Slot occupied, viewing other slots at lot:', lotId);
@@ -183,28 +183,8 @@ const DriverDashboard = () => {
           onLotClick={handleLotClick}
           onViewAllClick={handleViewAllLots}
         />
-
-          {/* Parking Grid Section 
-          <div className="parking-section">
-            <ParkingGrid onSlotSelect={handleSlotSelect} />
-          </div>
-          */}
-
         </div>
       </div>
-
-      {/* Booking Modal 
-      {isBookingModalOpen && (
-        <BookingModal
-          slot={selectedSlot}
-          isOpen={isBookingModalOpen}
-          onClose={() => {
-            setIsBookingModalOpen(false);
-            setSelectedSlot(null);
-          }}
-          onComplete={handleBookingComplete}
-        />
-      )}*/}
     </>
   );
 };

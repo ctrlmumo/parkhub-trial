@@ -15,7 +15,7 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'driver' // 'driver' or 'admin'
+    role: 'driver' // 'driver' or 'manager'
   });
   
   // UI state
@@ -170,7 +170,7 @@ const Login = () => {
               onClick={() => handleRoleChange('admin')}
             >
               <Shield size={18} />
-              <span>Admin</span>
+              <span>Manager</span>
             </button>
           </div>
 

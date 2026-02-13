@@ -212,7 +212,7 @@ export const SLOT_STATUS = {
   export const APP_INFO = {
     NAME: 'ParkHub',
     VERSION: '1.0.0',
-    DESCRIPTION: 'Smart Parking Management System',
+    DESCRIPTION: 'Smart Parking Allocation System',
     SUPPORT_EMAIL: 'support@parkhub.com',
     SUPPORT_PHONE: '+254 700 000 000'
   };

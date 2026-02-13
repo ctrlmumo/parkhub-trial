@@ -8,9 +8,6 @@
     padding: var(--spacing-xl);
     position: relative;
     overflow: hidden;
-    
-    /* Fade-in animation on page load */
-    /*animation: fadeIn 0.6s ease-out;*/
   }
   
   @keyframes fadeIn {
