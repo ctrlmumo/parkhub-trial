@@ -1,3 +1,13 @@
+/**
+ * ParkHub - Slot Management Page (Manager)
+ * 
+ * Manage parking slots for owned lots
+ * - Select parking lot
+ * - View all slots in table
+ * - Update slot statuses
+ * - Search/filter slots
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, ChevronDown } from 'lucide-react';
@@ -17,12 +27,14 @@ const SlotManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /* Load manager's parking lots on mount */
+  /**
+   * Load manager's parking lots on mount
+   */
   useEffect(() => {
     loadParkingLots();
   }, []);
 
-  /*
+  /**
    * Load parking lots
    * TODO: Replace with API call
    */
@@ -31,14 +43,12 @@ const SlotManagement = () => {
     
     // Simulate API call
     setTimeout(() => {
-      // Mock data - empty initially
+      // Empty initially - no mock data
       const mockLots = [];
       
-      // Uncomment for demo data:
-      // const mockLots = [
-      //   { id: 1, name: 'Main Campus Lot', location: 'University Way, Nairobi', totalSlots: 48 },
-      //   { id: 2, name: 'Library Parking', location: 'Library Block, Nairobi', totalSlots: 32 }
-      // ];
+      // TODO: Replace with real API call
+      // const response = await api.get('/manager/parking-lots');
+      // setParkingLots(response.data);
       
       setParkingLots(mockLots);
       
@@ -51,33 +61,39 @@ const SlotManagement = () => {
     }, 500);
   };
 
-  /* Load slots for selected lot */
+  /**
+   * Load slots for selected lot
+   */
   const loadSlots = (lotId) => {
-    // Mock slots data
-    const mockSlots = [];
-    const sections = ['A', 'B', 'C', 'D'];
-    const statuses = ['available', 'occupied', 'maintenance'];
+    // TODO: Replace with real API call
+    // const response = await api.get(`/parking-lots/${lotId}/slots`);
+    // setSlots(response.data);
     
-    sections.forEach(section => {
-      for (let i = 1; i <= 12; i++) {
+    // For now, generate slots based on lot configuration
+    const lot = parkingLots.find(l => l.id === lotId);
+    if (!lot) return;
+    
+    const generatedSlots = [];
+    lot.sections.forEach(section => {
+      for (let i = 1; i <= lot.slotsPerSection; i++) {
         const slotNumber = `${section}${i.toString().padStart(2, '0')}`;
-        const statusIndex = Math.floor(Math.random() * statuses.length);
-        
-        mockSlots.push({
+        generatedSlots.push({
           id: `${lotId}-${slotNumber}`,
           slotNumber: slotNumber,
           section: `Section ${section}`,
-          status: statuses[statusIndex],
-          vehicle: statuses[statusIndex] === 'occupied' ? `KCA ${Math.floor(Math.random() * 999)}B` : null
+          status: 'available', // All start as available
+          vehicle: null
         });
       }
     });
     
-    setSlots(mockSlots);
-    setFilteredSlots(mockSlots);
+    setSlots(generatedSlots);
+    setFilteredSlots(generatedSlots);
   };
 
-  /* Handle lot selection */
+  /**
+   * Handle lot selection
+   */
   const handleLotSelect = (lot) => {
     setSelectedLot(lot);
     loadSlots(lot.id);
@@ -85,7 +101,45 @@ const SlotManagement = () => {
     setStatusFilter('all');
   };
 
-  /* Handle search */
+  /**
+   * Handle manage slots button
+   */
+  const handleManageSlots = (lot) => {
+    setSelectedLot(lot);
+    loadSlots(lot.id);
+  };
+
+  /**
+   * Handle edit lot
+   */
+  const handleEditLot = (lot) => {
+    // TODO: Open edit modal
+    alert(`Edit lot: ${lot.name}\n\nEdit modal coming soon!`);
+  };
+
+  /**
+   * Handle delete lot
+   */
+  const handleDeleteLot = (lot) => {
+    if (window.confirm(`Are you sure you want to delete "${lot.name}"?\n\nThis will delete all ${lot.totalSlots} slots and cannot be undone.`)) {
+      // Remove lot
+      setParkingLots(prev => prev.filter(l => l.id !== lot.id));
+      
+      // Clear selection if deleting selected lot
+      if (selectedLot?.id === lot.id) {
+        setSelectedLot(null);
+        setSlots([]);
+        setFilteredSlots([]);
+      }
+      
+      // TODO: Call API to delete
+      // await api.delete(`/parking-lots/${lot.id}`);
+    }
+  };
+
+  /**
+   * Handle search
+   */
   useEffect(() => {
     let filtered = [...slots];
     
@@ -172,6 +226,7 @@ const SlotManagement = () => {
           <div className="page-header">
             <div>
               <h1 className="page-title">Slot Management</h1>
+              <p className="page-subtitle">Manage and override parking slot statuses</p>
             </div>
           </div>
 
@@ -229,125 +284,136 @@ const SlotManagement = () => {
           </button>
         </div>
 
-        {/* Parking Lot Selector */}
-        <div className="lot-selector-card">
-          <label className="lot-selector-label">Select Parking Lot:</label>
-          <div className="lot-selector-buttons">
-            {parkingLots.map(lot => (
-              <button
-                key={lot.id}
-                onClick={() => handleLotSelect(lot)}
-                className={`lot-button ${selectedLot?.id === lot.id ? 'active' : ''}`}
-              >
-                <div className="lot-button-content">
-                  <span className="lot-name">{lot.name}</span>
-                  <span className="lot-location">{lot.location}</span>
-                </div>
-                <span className="lot-slots">{lot.totalSlots} slots</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Search and Filter */}
-        <div className="filters-card">
-          <div className="search-box">
-            <Search size={20} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search by slot number or vehicle..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
+        {/* Parking Lots Grid */}
+        <div className="parking-lots-grid">
+          {parkingLots.map(lot => (
+            <ParkingLotCard
+              key={lot.id}
+              lot={lot}
+              onManageSlots={handleManageSlots}
+              onEdit={handleEditLot}
+              onDelete={handleDeleteLot}
             />
-          </div>
-
-          <div className="filter-dropdown">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="status-filter"
-            >
-              <option value="all">All Statuses</option>
-              <option value="available">Available</option>
-              <option value="occupied">Occupied</option>
-              <option value="maintenance">Maintenance</option>
-            </select>
-            <ChevronDown size={18} className="dropdown-icon" />
-          </div>
+          ))}
         </div>
 
-        {/* Slots Table */}
-        <div className="slots-table-card">
-          <div className="table-header">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="14" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-            </svg>
-            <h3 className="table-title">
-              All Parking Slots ({filteredSlots.length})
-            </h3>
-          </div>
+        {/* Show slot management only when a lot is selected */}
+        {selectedLot && (
+          <>
+            {/* Selected Lot Header */}
+            <div className="selected-lot-header">
+              <h2 className="selected-lot-title">
+                Managing: {selectedLot.name}
+              </h2>
+              <button 
+                onClick={() => setSelectedLot(null)}
+                className="btn-back-to-lots"
+              >
+                ← Back to Lots
+              </button>
+            </div>
 
-          <div className="table-container">
-            <table className="slots-table">
-              <thead>
-                <tr>
-                  <th>Slot</th>
-                  <th>Section</th>
-                  <th>Status</th>
-                  <th>Vehicle</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSlots.map(slot => (
-                  <tr key={slot.id}>
-                    <td>
-                      <span className="slot-number">{slot.slotNumber}</span>
-                    </td>
-                    <td>
-                      <span className="slot-section">{slot.section}</span>
-                    </td>
-                    <td>
-                      <span className={`status-badge ${getStatusClass(slot.status)}`}>
-                        <span className="status-dot"></span>
-                        {getStatusLabel(slot.status)}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="vehicle-number">
-                        {slot.vehicle || '—'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="actions-dropdown">
-                        <select
-                          value={slot.status}
-                          onChange={(e) => handleStatusChange(slot.id, e.target.value)}
-                          className="action-select"
-                        >
-                          <option value="available">Available</option>
-                          <option value="occupied">Occupied</option>
-                          <option value="maintenance">Maintenance</option>
-                        </select>
-                        <ChevronDown size={16} className="action-dropdown-icon" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {filteredSlots.length === 0 && (
-              <div className="table-empty">
-                <p>No slots found matching your criteria.</p>
+            {/* Search and Filter */}
+            <div className="filters-card">
+              <div className="search-box">
+                <Search size={20} className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search by slot number or vehicle..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                />
               </div>
-            )}
-          </div>
-        </div>
+
+              <div className="filter-dropdown">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="status-filter"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="available">Available</option>
+                  <option value="occupied">Occupied</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+                <ChevronDown size={18} className="dropdown-icon" />
+              </div>
+            </div>
+
+            {/* Slots Table */}
+            <div className="slots-table-card">
+              <div className="table-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="3" width="7" height="7" rx="1"/>
+                  <rect x="14" y="3" width="7" height="7" rx="1"/>
+                  <rect x="14" y="14" width="7" height="7" rx="1"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <h3 className="table-title">
+                  All Parking Slots ({filteredSlots.length})
+                </h3>
+              </div>
+
+              <div className="table-container">
+                <table className="slots-table">
+                  <thead>
+                    <tr>
+                      <th>Slot</th>
+                      <th>Section</th>
+                      <th>Status</th>
+                      <th>Vehicle</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredSlots.map(slot => (
+                      <tr key={slot.id}>
+                        <td>
+                          <span className="slot-number">{slot.slotNumber}</span>
+                        </td>
+                        <td>
+                          <span className="slot-section">{slot.section}</span>
+                        </td>
+                        <td>
+                          <span className={`status-badge ${getStatusClass(slot.status)}`}>
+                            <span className="status-dot"></span>
+                            {getStatusLabel(slot.status)}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="vehicle-number">
+                            {slot.vehicle || '—'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="actions-dropdown">
+                            <select
+                              value={slot.status}
+                              onChange={(e) => handleStatusChange(slot.id, e.target.value)}
+                              className="action-select"
+                            >
+                              <option value="available">Available</option>
+                              <option value="occupied">Occupied</option>
+                              <option value="maintenance">Maintenance</option>
+                            </select>
+                            <ChevronDown size={16} className="action-dropdown-icon" />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {filteredSlots.length === 0 && (
+                  <div className="table-empty">
+                    <p>No slots found matching your criteria.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Create Lot Modal */}
