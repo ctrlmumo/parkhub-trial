@@ -9,6 +9,8 @@ import Register from './pages/auth/Register';
 import DriverDashboard from './pages/driver/Dashboard';
 import FindParking from './pages/driver/FindParking';
 import LotDetail from './pages/driver/LotDetail';
+import ManagerDashboard from './pages/manager/ManagerDashboard';
+import SlotManagement from './pages/manager/SlotManagement';
 
 const AdminDashboard = () => <div className="p-xl"><h1>Admin Dashboard</h1><p>Coming soon...</p></div>;
 
@@ -90,6 +92,25 @@ function App() {
             element={
               <ProtectedRoute>
                 <LotDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Manager Routes */}
+          <Route
+            path="/manager/dashboard"
+            element={
+              <ProtectedRoute>
+                <ManagerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/manager/slot-management"
+            element={
+              <ProtectedRoute>
+                <SlotManagement />
               </ProtectedRoute>
             }
           />

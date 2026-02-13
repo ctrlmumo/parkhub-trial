@@ -9,7 +9,7 @@ import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated, isAdmin } = useAuth();
+  const { login, isAuthenticated, isManager } = useAuth();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -98,9 +98,9 @@ const Login = () => {
         setTimeout(() => {
           // Redirect based on selected role tab
           // (In production, use the actual user role from backend)
-          if (formData.role === 'admin') {
-            console.log('Redirecting to admin dashboard');
-            navigate('/admin/dashboard', { replace: true });
+          if (formData.role === 'manager') {
+            console.log('Redirecting to manager dashboard');
+            navigate('/manager/dashboard', { replace: true });
           } else {
             console.log('Redirecting to driver dashboard');
             navigate('/driver/dashboard', { replace: true });
@@ -122,7 +122,7 @@ const Login = () => {
 
   // Auto-fill demo credentials helper
   const fillDemoCredentials = (role) => {
-    const email = role === 'admin' ? 'admin@demo.com' : 'driver@demo.com';
+    const email = role === 'manager' ? 'manager@demo.com' : 'driver@demo.com';
     setFormData(prev => ({
       ...prev,
       email,
@@ -166,8 +166,8 @@ const Login = () => {
             </button>
             <button
               type="button"
-              className={`role-tab ${formData.role === 'admin' ? 'active' : ''}`}
-              onClick={() => handleRoleChange('admin')}
+              className={`role-tab ${formData.role === 'manager' ? 'active' : ''}`}
+              onClick={() => handleRoleChange('manager')}
             >
               <Shield size={18} />
               <span>Manager</span>
@@ -259,15 +259,15 @@ const Login = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => fillDemoCredentials('admin')}
+                  onClick={() => fillDemoCredentials('manager')}
                   className="demo-button"
                 >
-                  <strong>Admin:</strong>
-                  <span>admin@demo.com / password123</span>
+                  <strong>Manager:</strong>
+                  <span>manager@demo.com / password123</span>
                 </button>
               </div>
               <p style={{ fontSize: '11px', color: 'var(--muted-foreground)', marginTop: '8px', textAlign: 'center' }}>
-                ℹ️ Click to auto-fill credentials
+                Click to auto-fill credentials
               </p>
             </div>
           )}

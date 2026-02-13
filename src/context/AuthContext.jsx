@@ -46,15 +46,15 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('🔐 Login attempt:', { email });
+      console.log('Login attempt:', { email });
       
       // MOCK AUTHENTICATION (Remove when backend is ready)     
       // Check for demo credentials
       const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
-      const isDemoAdmin = email === 'admin@demo.com' && password === 'password123';
+      const isDemoManager = email === 'manager@demo.com' && password === 'password123';
       
-      if (isDemoDriver || isDemoAdmin) {
-        console.log('✅ Using MOCK authentication');
+      if (isDemoDriver || isDemoManager) {
+        console.log('Using MOCK authentication');
         
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -62,9 +62,9 @@ export const AuthProvider = ({ children }) => {
         // Create mock user data
         const mockUser = {
           id: isDemoDriver ? 1 : 2,
-          username: isDemoDriver ? 'Demo Driver' : 'Demo Admin',
+          username: isDemoDriver ? 'Demo Driver' : 'Demo Manager',
           email: email,
-          is_admin: isDemoAdmin,
+          is_manager: isDemoManager,
           phone_number: isDemoDriver ? '254712345678' : null,
           vehicle_reg: isDemoDriver ? 'KCA 456B' : null
         };
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
         // Update state
         setUser(mockUser);
         
-        console.log('✅ Mock login successful:', mockUser);
+        console.log('Mock login successful:', mockUser);
         
         return { 
           success: true, 
@@ -159,7 +159,7 @@ export const AuthProvider = ({ children }) => {
         id: Date.now(),
         username: userData.username,
         email: userData.email,
-        is_admin: false,
+        is_manager: false,
         phone_number: userData.phoneNumber || null,
         vehicle_reg: userData.vehicleReg || null
       };
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
       // Update state
       setUser(mockUser);
       
-      console.log('✅ Mock registration successful:', mockUser);
+      console.log('Mock registration successful:', mockUser);
       
       return { 
         success: true, 
@@ -304,9 +304,9 @@ export const AuthProvider = ({ children }) => {
   /* COMPUTED VALUES */
 
   const isAuthenticated = !!user;
-  const isAdmin = user?.is_admin === true;
-  const isDriver = user?.is_admin === false;
-  const userRole = isAdmin ? USER_ROLES.ADMIN : USER_ROLES.DRIVER;
+  const isManager = user?.is_manager === true;
+  const isDriver = user?.is_manager === false;
+  const userRole = isManager ? USER_ROLES.MANAGER : USER_ROLES.DRIVER;
 
   /* CONTEXT VALUE */
 
@@ -318,7 +318,7 @@ export const AuthProvider = ({ children }) => {
     
     // Computed values
     isAuthenticated,
-    isAdmin,
+    isManager,
     isDriver,
     userRole,
     

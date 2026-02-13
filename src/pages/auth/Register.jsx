@@ -296,7 +296,7 @@ const Register = () => {
 
         {/* Footer */}
         <div className="auth-page-footer">
-          <p>&copy; 2024 ParkHub. All rights reserved.</p>
+          <p>&copy; 2026 ParkHub. All rights reserved.</p>
         </div>
       </div>
     </div>
