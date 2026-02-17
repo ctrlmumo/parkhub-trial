@@ -1,13 +1,3 @@
-/**
- * ParkHub - Slot Management Page (Manager)
- * 
- * Manage parking slots for owned lots
- * - Select parking lot
- * - View all slots in table
- * - Update slot statuses
- * - Search/filter slots
- */
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, ChevronDown } from 'lucide-react';
@@ -27,17 +17,13 @@ const SlotManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /**
-   * Load manager's parking lots on mount
-   */
+  /* Load manager's parking lots on mount */
   useEffect(() => {
     loadParkingLots();
   }, []);
 
-  /**
-   * Load parking lots
-   * TODO: Replace with API call
-   */
+  /* Load parking lots
+   * TODO: Replace with API call */
   const loadParkingLots = async () => {
     setLoading(true);
     
@@ -61,9 +47,7 @@ const SlotManagement = () => {
     }, 500);
   };
 
-  /**
-   * Load slots for selected lot
-   */
+  /* Load slots for selected lot */
   const loadSlots = (lotId) => {
     // TODO: Replace with real API call
     // const response = await api.get(`/parking-lots/${lotId}/slots`);
@@ -91,9 +75,7 @@ const SlotManagement = () => {
     setFilteredSlots(generatedSlots);
   };
 
-  /**
-   * Handle lot selection
-   */
+  /* Handle lot selection */
   const handleLotSelect = (lot) => {
     setSelectedLot(lot);
     loadSlots(lot.id);
@@ -101,25 +83,19 @@ const SlotManagement = () => {
     setStatusFilter('all');
   };
 
-  /**
-   * Handle manage slots button
-   */
+  /* Handle manage slots button */
   const handleManageSlots = (lot) => {
     setSelectedLot(lot);
     loadSlots(lot.id);
   };
 
-  /**
-   * Handle edit lot
-   */
+  /* Handle edit lot */
   const handleEditLot = (lot) => {
     // TODO: Open edit modal
     alert(`Edit lot: ${lot.name}\n\nEdit modal coming soon!`);
   };
 
-  /**
-   * Handle delete lot
-   */
+  /* Handle delete lot */
   const handleDeleteLot = (lot) => {
     if (window.confirm(`Are you sure you want to delete "${lot.name}"?\n\nThis will delete all ${lot.totalSlots} slots and cannot be undone.`)) {
       // Remove lot
@@ -137,9 +113,7 @@ const SlotManagement = () => {
     }
   };
 
-  /**
-   * Handle search
-   */
+  /* Handle search */
   useEffect(() => {
     let filtered = [...slots];
     
@@ -159,9 +133,7 @@ const SlotManagement = () => {
     setFilteredSlots(filtered);
   }, [searchQuery, statusFilter, slots]);
 
-  /**
-   * Handle status change
-   */
+  /* Handle status change */
   const handleStatusChange = (slotId, newStatus) => {
     setSlots(prevSlots =>
       prevSlots.map(slot =>
@@ -170,9 +142,7 @@ const SlotManagement = () => {
     );
   };
 
-  /**
-   * Handle lot created
-   */
+  /* Handle lot created */
   const handleLotCreated = (newLot) => {
     setParkingLots(prev => [...prev, newLot]);
     setSelectedLot(newLot);
@@ -180,9 +150,7 @@ const SlotManagement = () => {
     setShowCreateModal(false);
   };
 
-  /**
-   * Get status badge class
-   */
+  /* Get status badge class */
   const getStatusClass = (status) => {
     const classes = {
       available: 'status-available',
@@ -192,9 +160,7 @@ const SlotManagement = () => {
     return classes[status] || 'status-available';
   };
 
-  /**
-   * Get status label
-   */
+  /* Get status label */
   const getStatusLabel = (status) => {
     const labels = {
       available: 'Available',
@@ -240,9 +206,6 @@ const SlotManagement = () => {
               </svg>
             </div>
             <h2 className="empty-state-title">No Parking Lots Yet</h2>
-            <p className="empty-state-description">
-              Create your first parking lot to start managing slots and accepting bookings.
-            </p>
             <button 
               onClick={() => setShowCreateModal(true)}
               className="btn-create-lot"
