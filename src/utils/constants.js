@@ -27,7 +27,8 @@ export const SLOT_STATUS = {
   /*User roles*/
   export const USER_ROLES = {
     DRIVER: 'driver',
-    ADMIN: 'admin'
+    MANAGER: 'manager',
+    ADMIN: 'admin',
   };
   
   
