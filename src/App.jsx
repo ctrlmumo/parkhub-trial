@@ -127,6 +127,33 @@ function App() {
             }
           />
 
+          <Route
+            path="/admin/user-management"
+            element={
+              <PublicRoute adminOnly>
+                <UserManagement />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/admin/booking-management"
+            element={
+              <PublicRoute adminOnly>
+                <BookingManagement />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/admin/analytics"
+            element={
+              <PublicRoute adminOnly>
+                <Analytics />
+              </PublicRoute>
+            }
+          />
+
           {/* 404 - Redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
