@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       
       console.log('Login attempt:', { email });
       
-      // MOCK AUTHENTICATION (Remove when backend is ready)     
+      // MOCK AUTHENTICATION (Remove when backend is ready)
       // Check for demo credentials
       const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
       const isDemoManager = email === 'manager@demo.com' && password === 'password123';
@@ -267,12 +267,12 @@ export const AuthProvider = ({ children }) => {
       saveToStorage(STORAGE_KEYS.USER, updatedUser);
       setUser(updatedUser);
       
-      console.log('✅ User updated:', updatedUser);
+      console.log('User updated:', updatedUser);
       
       return { success: true };
       
     } catch (error) {
-      console.error('❌ Update user error:', error);
+      console.error('Update user error:', error);
       
       const errorMessage = error.response?.data?.message || 
                           'Failed to update profile';

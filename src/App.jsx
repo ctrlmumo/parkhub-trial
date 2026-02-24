@@ -11,8 +11,10 @@ import FindParking from './pages/driver/FindParking';
 import LotDetail from './pages/driver/LotDetail';
 import ManagerDashboard from './pages/manager/ManagerDashboard';
 import SlotManagement from './pages/manager/SlotManagement';
-
-const AdminDashboard = () => <div className="p-xl"><h1>Admin Dashboard</h1><p>Coming soon...</p></div>;
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagement from './pages/admin/UserManagement';
+import BookingManagement from './pages/admin/BookingManagement';
+import Analytics from './pages/admin/Analytics';
 
 
 /* Redirects to dashboard if already logged in */
@@ -119,9 +121,9 @@ function App() {
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute adminOnly>
+              <PublicRoute adminOnly>
                 <AdminDashboard />
-              </ProtectedRoute>
+              </PublicRoute>
             }
           />
 

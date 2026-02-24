@@ -65,7 +65,7 @@ const SlotManagement = () => {
           id: `${lotId}-${slotNumber}`,
           slotNumber: slotNumber,
           section: `Section ${section}`,
-          status: 'available', // All start as available
+          status: 'available', //default
           vehicle: null
         });
       }
@@ -370,7 +370,7 @@ const SlotManagement = () => {
 
                 {filteredSlots.length === 0 && (
                   <div className="table-empty">
-                    <p>No slots found matching your criteria.</p>
+                    <p>No slots found.</p>
                   </div>
                 )}
               </div>
