@@ -52,8 +52,34 @@ export const AuthProvider = ({ children }) => {
       // Check for demo credentials
       const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
       const isDemoManager = email === 'manager@demo.com' && password === 'password123';
-      
-      if (isDemoDriver || isDemoManager) {
+      const isDemoAdmin = email === 'admin@demo.com' && password === 'password123';
+
+      if (isDemoAdmin) {
+        mockUser.role = 'admin';
+      } else if (isDemoManager) {
+        mockUser.role = 'manager';
+      } else if (isDemoDriver) {
+        mockUser.role = 'driver';
+      }
+
+      //helper functions
+      const isSystemAdmin = () => {
+        return user?.role === USER_ROLES.ADMIN;
+      };
+
+      const isManager = () => {
+        return user?.role === USER_ROLES.MANAGER;
+      };
+
+      const isDriver = () => {
+        return user?.role === USER_ROLES.DRIVER;
+      };
+
+      // Legacy compatibility (deprecated)
+      const isAdmin = () => isSystemAdmin();
+      const isRegularUser = () => isDriver();
+
+      if (isDemoDriver || isDemoManager || isDemoAdmin) {
         console.log('Using MOCK authentication');
         
         // Simulate API delay
@@ -61,13 +87,12 @@ export const AuthProvider = ({ children }) => {
         
         // Create mock user data
         const mockUser = {
-          id: isDemoDriver ? 1 : 2,
-          username: isDemoDriver ? 'Demo Driver' : 'Demo Manager',
+          id: 1,
+          username: 'Demo User',
           email: email,
-          is_manager: isDemoManager,
-          phone_number: isDemoDriver ? '254712345678' : null,
-          vehicle_reg: isDemoDriver ? 'KCA 456B' : null
-        };
+          role: 'driver', 
+          is_active: true
+};
         
         const mockToken = `mock_token_${Date.now()}`;
         
@@ -163,6 +188,8 @@ export const AuthProvider = ({ children }) => {
         phone_number: userData.phoneNumber || null,
         vehicle_reg: userData.vehicleReg || null
       };
+
+
       
       const mockToken = `mock_token_${Date.now()}`;
       
@@ -319,8 +346,9 @@ export const AuthProvider = ({ children }) => {
     // Computed values
     isAuthenticated,
     isManager,
-    isDriver,
     userRole,
+    isAdmin,
+    isDriver,
     
     // Functions
     login,
