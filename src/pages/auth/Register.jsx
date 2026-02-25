@@ -9,8 +9,8 @@ import './Auth.css';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
-  
+  const { register, getDashboardPath } = useAuth();
+
   // Form state
   const [formData, setFormData] = useState({
     username: '',
@@ -19,9 +19,9 @@ const Register = () => {
     vehicleReg: '',
     password: '',
     confirmPassword: '',
-    role: 'driver' // 'driver' or 'admin'
+    role: 'driver'
   });
-  
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -30,7 +30,7 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear error for this field when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -83,12 +83,10 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handle form submission
-   */
+  /* Handle registration submission */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate
     if (!validateForm()) {
       return;
@@ -103,16 +101,14 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         phoneNumber: formData.phoneNumber,
-        vehicleReg: formData.vehicleReg
+        vehicleReg: formData.vehicleReg,
+        role: formData.role // Pass the role!
       });
 
       if (success) {
-        // Success - redirect based on role
-        if (formData.role === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/driver/dashboard');
-        }
+        // Success - redirect based on actual user account
+        const dashboardPath = getDashboardPath();
+        navigate(dashboardPath);
       } else {
         // Show error
         setErrors({ submit: error || 'Registration failed. Please try again.' });
@@ -156,6 +152,14 @@ const Register = () => {
             >
               <Car size={18} />
               <span>Driver</span>
+            </button>
+            <button
+              type="button"
+              className={`role-tab ${formData.role === 'manager' ? 'active' : ''}`}
+              onClick={() => handleRoleChange('manager')}
+            >
+              <Shield size={18} />
+              <span>Manager</span>
             </button>
             <button
               type="button"

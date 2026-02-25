@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Car, Shield, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Input from '../../components/common/Input';
@@ -9,42 +9,40 @@ import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated, isManager } = useAuth();
-  
+  const location = useLocation();
+  const { login, isAuthenticated, getDashboardPath } = useAuth();
+
+  // Get the page user was trying to access before being redirected to login
+  const from = location.state?.from?.pathname || null;
+
   // Form state
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'driver' // 'driver' or 'manager'
+    role: 'driver'
   });
-  
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  /**
-   * Handle input changes
-   */
+  /* Handle input changes */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear error for this field when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  /**
-   * Handle role tab selection
-   */
+  /* Handle role tab selection */
   const handleRoleChange = (role) => {
     setFormData(prev => ({ ...prev, role }));
   };
 
-  /**
-   * Validate form
-   */
+  /* Validate form */
   const validateForm = () => {
     const newErrors = {};
 
@@ -66,14 +64,12 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handle form submission
-   */
+  /* Handle form submission */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log('Login form submitted');
-    
+
     // Validate
     if (!validateForm()) {
       console.log('Validation failed');
@@ -85,7 +81,7 @@ const Login = () => {
 
     try {
       console.log('Attempting login...');
-      
+
       // Attempt login
       const { success, error } = await login(formData.email, formData.password);
 
@@ -93,20 +89,17 @@ const Login = () => {
 
       if (success) {
         console.log('Login successful! Redirecting...');
-        
+
         // Small delay to ensure state is updated
         setTimeout(() => {
-          // Redirect based on selected role tab
-          // (In production, use the actual user role from backend)
-          if (formData.role === 'manager') {
-            console.log('Redirecting to manager dashboard');
-            navigate('/manager/dashboard', { replace: true });
-          } else {
-            console.log('Redirecting to driver dashboard');
-            navigate('/driver/dashboard', { replace: true });
-          }
+          // Use the dashboard helper or the 'from' path
+          const dashboardPath = getDashboardPath();
+          const targetPath = from || dashboardPath;
+
+          console.log(`Redirecting to: ${targetPath}`);
+          navigate(targetPath, { replace: true });
         }, 100);
-        
+
       } else {
         // Show error
         console.log('Login failed:', error);
@@ -171,6 +164,14 @@ const Login = () => {
             >
               <Shield size={18} />
               <span>Manager</span>
+            </button>
+            <button
+              type="button"
+              className={`role-tab ${formData.role === 'admin' ? 'active' : ''}`}
+              onClick={() => handleRoleChange('admin')}
+            >
+              <Shield size={18} />
+              <span>Admin</span>
             </button>
           </div>
 
@@ -264,6 +265,14 @@ const Login = () => {
                 >
                   <strong>Manager:</strong>
                   <span>manager@demo.com / password123</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemoCredentials('admin')}
+                  className="demo-button"
+                >
+                  <strong>Admin:</strong>
+                  <span>admin@demo.com / password123</span>
                 </button>
               </div>
               <p style={{ fontSize: '11px', color: 'var(--muted-foreground)', marginTop: '8px', textAlign: 'center' }}>

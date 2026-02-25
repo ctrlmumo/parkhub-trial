@@ -19,7 +19,7 @@ import Analytics from './pages/admin/Analytics';
 
 /* Redirects to dashboard if already logged in */
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, getDashboardPath, loading } = useAuth();
 
   if (loading) {
     return (
@@ -31,7 +31,7 @@ const PublicRoute = ({ children }) => {
 
   // Already authenticated - redirect to appropriate dashboard
   if (isAuthenticated) {
-    return <Navigate to={isAdmin ? '/admin/dashboard' : '/driver/dashboard'} replace />;
+    return <Navigate to={getDashboardPath()} replace />;
   }
 
   return children;
@@ -102,7 +102,7 @@ function App() {
           <Route
             path="/manager/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute managerOnly>
                 <ManagerDashboard />
               </ProtectedRoute>
             }
@@ -111,7 +111,7 @@ function App() {
           <Route
             path="/manager/slot-management"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute managerOnly>
                 <SlotManagement />
               </ProtectedRoute>
             }
@@ -121,36 +121,36 @@ function App() {
           <Route
             path="/admin/dashboard"
             element={
-              <PublicRoute adminOnly>
+              <ProtectedRoute adminOnly>
                 <AdminDashboard />
-              </PublicRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
             path="/admin/user-management"
             element={
-              <PublicRoute adminOnly>
+              <ProtectedRoute adminOnly>
                 <UserManagement />
-              </PublicRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
             path="/admin/booking-management"
             element={
-              <PublicRoute adminOnly>
+              <ProtectedRoute adminOnly>
                 <BookingManagement />
-              </PublicRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
             path="/admin/analytics"
             element={
-              <PublicRoute adminOnly>
+              <ProtectedRoute adminOnly>
                 <Analytics />
-              </PublicRoute>
+              </ProtectedRoute>
             }
           />
 

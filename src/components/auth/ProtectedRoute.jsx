@@ -1,8 +1,9 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+const ProtectedRoute = ({ children, adminOnly = false, managerOnly = false }) => {
+  const { isAuthenticated, isAdmin, isManager, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -13,10 +14,19 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Save the current location they were trying to access
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Admin only check
   if (adminOnly && !isAdmin) {
+    console.warn('Unauthorized access attempt to admin page');
+    return <Navigate to="/driver/dashboard" replace />;
+  }
+
+  // Manager only check
+  if (managerOnly && !isManager && !isAdmin) {
+    console.warn('Unauthorized access attempt to manager page');
     return <Navigate to="/driver/dashboard" replace />;
   }
 

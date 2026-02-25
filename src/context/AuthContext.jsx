@@ -10,7 +10,7 @@ const AuthContext = createContext(null);
 /* AUTH PROVIDER COMPONENT */
 
 export const AuthProvider = ({ children }) => {
-  
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const storedUser = getFromStorage(STORAGE_KEYS.USER);
         const storedToken = getFromStorage(STORAGE_KEYS.TOKEN);
-        
+
         if (storedUser && storedToken) {
           console.log('Restored user session:', storedUser);
           setUser(storedUser);
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    
+
     initializeAuth();
   }, []);
 
@@ -45,50 +45,54 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       console.log('Login attempt:', { email });
-      
+
       // MOCK AUTHENTICATION (Remove when backend is ready)     
       // Check for demo credentials
       const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
       const isDemoManager = email === 'manager@demo.com' && password === 'password123';
-      
-      if (isDemoDriver || isDemoManager) {
+      const isDemoAdmin = email === 'admin@demo.com' && password === 'password123';
+
+      if (isDemoDriver || isDemoManager || isDemoAdmin) {
         console.log('Using MOCK authentication');
-        
+
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // Create mock user data
         const mockUser = {
-          id: isDemoDriver ? 1 : 2,
-          username: isDemoDriver ? 'Demo Driver' : 'Demo Manager',
+          id: isDemoDriver ? 1 : isDemoManager ? 2 : 3,
+          username: isDemoDriver ? 'Demo Driver' : isDemoManager ? 'Demo Manager' : 'Demo Admin',
           email: email,
           is_manager: isDemoManager,
+          is_admin: isDemoAdmin,
+          role: isDemoAdmin ? USER_ROLES.ADMIN : (isDemoManager ? USER_ROLES.MANAGER : USER_ROLES.DRIVER),
           phone_number: isDemoDriver ? '254712345678' : null,
           vehicle_reg: isDemoDriver ? 'KCA 456B' : null
         };
-        
+
         const mockToken = `mock_token_${Date.now()}`;
-        
+
         // Store authentication data
         setAuthToken(mockToken);
         saveToStorage(STORAGE_KEYS.TOKEN, mockToken);
         saveToStorage(STORAGE_KEYS.USER, mockUser);
-        
+
         // Update state
         setUser(mockUser);
-        
+
         console.log('Mock login successful:', mockUser);
-        
-        return { 
-          success: true, 
-          message: SUCCESS_MESSAGES.LOGIN_SUCCESS 
+
+        return {
+          success: true,
+          message: SUCCESS_MESSAGES.LOGIN_SUCCESS,
+          user: mockUser
         };
       }
-      
+
       // REAL API CALL (Uncomment when backend is ready)
-      
+
       /*
       const response = await api.post('/auth/login/', {
         email,
@@ -109,89 +113,94 @@ export const AuthProvider = ({ children }) => {
       
       return { 
         success: true, 
-        message: SUCCESS_MESSAGES.LOGIN_SUCCESS 
+        message: SUCCESS_MESSAGES.LOGIN_SUCCESS,
+        user: userData
       };
       */
-      
+
       // If not demo credentials and backend not ready
-      const errorMessage = 'Invalid credentials. Try: driver@demo.com / password123';
+      const errorMessage = 'Invalid credentials.';
       setError(errorMessage);
-      
-      return { 
-        success: false, 
-        error: errorMessage 
+
+      return {
+        success: false,
+        error: errorMessage
       };
-      
+
     } catch (error) {
       console.error('Login error:', error);
-      
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          ERROR_MESSAGES.LOGIN_FAILED;
-      
+
+      const errorMessage = error.response?.data?.message ||
+        error.response?.data?.error ||
+        ERROR_MESSAGES.LOGIN_FAILED;
+
       setError(errorMessage);
-      
-      return { 
-        success: false, 
-        error: errorMessage 
+
+      return {
+        success: false,
+        error: errorMessage
       };
-      
+
     } finally {
       setLoading(false);
     }
   };
 
   /* REGISTER FUNCTION - WITH MOCK FALLBACK */
-  const register = async (userData) => {
+  const register = async (registerData) => {
     try {
       setLoading(true);
       setError(null);
-      
-      console.log('📝 Register attempt:', { email: userData.email });
-      
+
+      console.log('Register attempt:', { email: registerData.email });
+
       // MOCK REGISTRATION (Remove when backend is ready)
-      
+
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       // Create mock user
       const mockUser = {
         id: Date.now(),
-        username: userData.username,
-        email: userData.email,
-        is_manager: false,
-        phone_number: userData.phoneNumber || null,
-        vehicle_reg: userData.vehicleReg || null
+        username: registerData.username,
+        email: registerData.email,
+        is_manager: registerData.role === USER_ROLES.MANAGER,
+        is_admin: registerData.role === USER_ROLES.ADMIN,
+        role: registerData.role || USER_ROLES.DRIVER,
+        phone_number: registerData.phoneNumber || null,
+        vehicle_reg: registerData.vehicleReg || null
       };
-      
+
       const mockToken = `mock_token_${Date.now()}`;
-      
+
       // Store authentication data
       setAuthToken(mockToken);
       saveToStorage(STORAGE_KEYS.TOKEN, mockToken);
       saveToStorage(STORAGE_KEYS.USER, mockUser);
-      
+
       // Update state
       setUser(mockUser);
-      
+
       console.log('Mock registration successful:', mockUser);
-      
-      return { 
-        success: true, 
-        message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS 
+
+      return {
+        success: true,
+        message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS,
+        user: mockUser
       };
-      
+
       // ============================================================
       // REAL API CALL (Uncomment when backend is ready)
       // ============================================================
-      
+
       /*
       const response = await api.post('/auth/register/', {
-        username: userData.username,
-        email: userData.email,
-        password: userData.password,
-        phone_number: userData.phoneNumber || null,
-        vehicle_reg: userData.vehicleReg || null
+        username: registerData.username,
+        email: registerData.email,
+        password: registerData.password,
+        role: registerData.role || USER_ROLES.DRIVER,
+        phone_number: registerData.phoneNumber || null,
+        vehicle_reg: registerData.vehicleReg || null
       });
       
       const { token, user: newUser } = response.data;
@@ -206,24 +215,25 @@ export const AuthProvider = ({ children }) => {
       
       return { 
         success: true, 
-        message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS 
+        message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS,
+        user: newUser
       };
       */
-      
+
     } catch (error) {
       console.error(' Registration error:', error);
-      
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          ERROR_MESSAGES.REGISTRATION_FAILED;
-      
+
+      const errorMessage = error.response?.data?.message ||
+        error.response?.data?.error ||
+        ERROR_MESSAGES.REGISTRATION_FAILED;
+
       setError(errorMessage);
-      
-      return { 
-        success: false, 
-        error: errorMessage 
+
+      return {
+        success: false,
+        error: errorMessage
       };
-      
+
     } finally {
       setLoading(false);
     }
@@ -234,19 +244,19 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = async () => {
     try {
-      console.log('👋 Logging out user');
-      
+      console.log('Logging out user');
+
       // Clear authentication data
       clearAuth();
       removeFromStorage(STORAGE_KEYS.TOKEN);
       removeFromStorage(STORAGE_KEYS.USER);
-      
+
       // Clear state
       setUser(null);
       setError(null);
-      
+
       console.log('Logout successful');
-      
+
     } catch (error) {
       console.error('Logout error:', error);
       // Even if error, still logout locally
@@ -261,27 +271,27 @@ export const AuthProvider = ({ children }) => {
   const updateUser = async (updatedData) => {
     try {
       setLoading(true);
-      
+
       // For mock: just update local storage
       const updatedUser = { ...user, ...updatedData };
       saveToStorage(STORAGE_KEYS.USER, updatedUser);
       setUser(updatedUser);
-      
+
       console.log('User updated:', updatedUser);
-      
+
       return { success: true };
-      
+
     } catch (error) {
       console.error('Update user error:', error);
-      
-      const errorMessage = error.response?.data?.message || 
-                          'Failed to update profile';
-      
-      return { 
-        success: false, 
-        error: errorMessage 
+
+      const errorMessage = error.response?.data?.message ||
+        'Failed to update profile';
+
+      return {
+        success: false,
+        error: errorMessage
       };
-      
+
     } finally {
       setLoading(false);
     }
@@ -293,7 +303,7 @@ export const AuthProvider = ({ children }) => {
       // For mock: just check if token exists
       const token = getFromStorage(STORAGE_KEYS.TOKEN);
       return !!token;
-      
+
     } catch (error) {
       console.error('Token verification failed:', error);
       logout();
@@ -304,9 +314,23 @@ export const AuthProvider = ({ children }) => {
   /* COMPUTED VALUES */
 
   const isAuthenticated = !!user;
-  const isManager = user?.is_manager === true;
-  const isDriver = user?.is_manager === false;
-  const userRole = isManager ? USER_ROLES.MANAGER : USER_ROLES.DRIVER;
+  const isAdmin = user?.is_admin === true || user?.role === USER_ROLES.ADMIN;
+  const isManager = user?.is_manager === true || user?.role === USER_ROLES.MANAGER;
+  const isDriver = !isAdmin && !isManager;
+
+  const userRole = isAdmin ? USER_ROLES.ADMIN : (isManager ? USER_ROLES.MANAGER : USER_ROLES.DRIVER);
+
+  /**
+   * Helper to get dashboard path based on role
+   */
+  const getDashboardPath = (userData = user) => {
+    if (!userData) return '/login';
+
+    if (userData.is_admin || userData.role === USER_ROLES.ADMIN) return '/admin/dashboard';
+    if (userData.is_manager || userData.role === USER_ROLES.MANAGER) return '/manager/dashboard';
+    if (userData.is_driver || userData.role === USER_ROLES.DRIVER) return '/driver/dashboard';
+    return '/login';
+  };
 
   /* CONTEXT VALUE */
 
@@ -315,20 +339,22 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     error,
-    
+
     // Computed values
     isAuthenticated,
+    isAdmin,
     isManager,
     isDriver,
     userRole,
-    
+
     // Functions
     login,
     register,
     logout,
     updateUser,
     verifyToken,
-    
+    getDashboardPath,
+
     // Utility
     setError,
     clearError: () => setError(null)
@@ -345,11 +371,11 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  
+
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  
+
   return context;
 };
 
