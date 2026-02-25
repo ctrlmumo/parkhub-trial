@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import api, { setAuthToken, clearAuth } from '../services/api';
+import api, { setAuthToken, getAuthToken, clearAuth } from '../services/api';
 import { STORAGE_KEYS, USER_ROLES, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/constants';
 import { getFromStorage, saveToStorage, removeFromStorage } from '../utils/helpers';
 
@@ -17,21 +17,34 @@ export const AuthProvider = ({ children }) => {
 
   /* Initialize auth on mount */
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
-        const storedUser = getFromStorage(STORAGE_KEYS.USER);
-        const storedToken = getFromStorage(STORAGE_KEYS.TOKEN);
+        const storedToken = getAuthToken();
 
-        if (storedUser && storedToken) {
-          console.log('Restored user session:', storedUser);
-          setUser(storedUser);
+        if (storedToken) {
           setAuthToken(storedToken);
+          
+          // Verify token and get fresh user data from backend
+          const response = await api.get('/auth/me/');
+          const userData = response.data;
+          
+          // Set helper flags
+          userData.is_admin = userData.role === USER_ROLES.ADMIN;
+          userData.is_manager = userData.role === USER_ROLES.MANAGER;
+          userData.is_driver = userData.role === USER_ROLES.DRIVER;
+
+          setUser(userData);
+          saveToStorage(STORAGE_KEYS.USER, userData);
         } else {
           console.log('No existing session found');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        handleLogout();
+        // If token is invalid, clear everything
+        clearAuth();
+        removeFromStorage(STORAGE_KEYS.TOKEN);
+        removeFromStorage(STORAGE_KEYS.USER);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -48,62 +61,23 @@ export const AuthProvider = ({ children }) => {
 
       console.log('Login attempt:', { email });
 
-      // MOCK AUTHENTICATION (Remove when backend is ready)     
-      // Check for demo credentials
-      const isDemoDriver = email === 'driver@demo.com' && password === 'password123';
-      const isDemoManager = email === 'manager@demo.com' && password === 'password123';
-      const isDemoAdmin = email === 'admin@demo.com' && password === 'password123';
-
-      if (isDemoDriver || isDemoManager || isDemoAdmin) {
-        console.log('Using MOCK authentication');
-
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Create mock user data
-        const mockUser = {
-          id: isDemoDriver ? 1 : isDemoManager ? 2 : 3,
-          username: isDemoDriver ? 'Demo Driver' : isDemoManager ? 'Demo Manager' : 'Demo Admin',
-          email: email,
-          is_manager: isDemoManager,
-          is_admin: isDemoAdmin,
-          role: isDemoAdmin ? USER_ROLES.ADMIN : (isDemoManager ? USER_ROLES.MANAGER : USER_ROLES.DRIVER),
-          phone_number: isDemoDriver ? '254712345678' : null,
-          vehicle_reg: isDemoDriver ? 'KCA 456B' : null
-        };
-
-        const mockToken = `mock_token_${Date.now()}`;
-
-        // Store authentication data
-        setAuthToken(mockToken);
-        saveToStorage(STORAGE_KEYS.TOKEN, mockToken);
-        saveToStorage(STORAGE_KEYS.USER, mockUser);
-
-        // Update state
-        setUser(mockUser);
-
-        console.log('Mock login successful:', mockUser);
-
-        return {
-          success: true,
-          message: SUCCESS_MESSAGES.LOGIN_SUCCESS,
-          user: mockUser
-        };
-      }
-
-      // REAL API CALL (Uncomment when backend is ready)
-
-      /*
+      // REAL API CALL
       const response = await api.post('/auth/login/', {
         email,
         password
       });
       
       const { token, user: userData } = response.data;
+
+      // Map backend role to frontend boolean flags if needed, 
+      // though your User model seems to have 'role' which matches USER_ROLES
+      // Ensure userData has necessary flags for getDashboardPath
+      userData.is_admin = userData.role === USER_ROLES.ADMIN;
+      userData.is_manager = userData.role === USER_ROLES.MANAGER;
+      userData.is_driver = userData.role === USER_ROLES.DRIVER;
       
       // Store token and user data
       setAuthToken(token);
-      saveToStorage(STORAGE_KEYS.TOKEN, token);
       saveToStorage(STORAGE_KEYS.USER, userData);
       
       // Update state
@@ -115,16 +89,6 @@ export const AuthProvider = ({ children }) => {
         success: true, 
         message: SUCCESS_MESSAGES.LOGIN_SUCCESS,
         user: userData
-      };
-      */
-
-      // If not demo credentials and backend not ready
-      const errorMessage = 'Invalid credentials.';
-      setError(errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage
       };
 
     } catch (error) {
@@ -154,46 +118,7 @@ export const AuthProvider = ({ children }) => {
 
       console.log('Register attempt:', { email: registerData.email });
 
-      // MOCK REGISTRATION (Remove when backend is ready)
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // Create mock user
-      const mockUser = {
-        id: Date.now(),
-        username: registerData.username,
-        email: registerData.email,
-        is_manager: registerData.role === USER_ROLES.MANAGER,
-        is_admin: registerData.role === USER_ROLES.ADMIN,
-        role: registerData.role || USER_ROLES.DRIVER,
-        phone_number: registerData.phoneNumber || null,
-        vehicle_reg: registerData.vehicleReg || null
-      };
-
-      const mockToken = `mock_token_${Date.now()}`;
-
-      // Store authentication data
-      setAuthToken(mockToken);
-      saveToStorage(STORAGE_KEYS.TOKEN, mockToken);
-      saveToStorage(STORAGE_KEYS.USER, mockUser);
-
-      // Update state
-      setUser(mockUser);
-
-      console.log('Mock registration successful:', mockUser);
-
-      return {
-        success: true,
-        message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS,
-        user: mockUser
-      };
-
-      // ============================================================
-      // REAL API CALL (Uncomment when backend is ready)
-      // ============================================================
-
-      /*
+      // REAL API CALL
       const response = await api.post('/auth/register/', {
         username: registerData.username,
         email: registerData.email,
@@ -204,10 +129,13 @@ export const AuthProvider = ({ children }) => {
       });
       
       const { token, user: newUser } = response.data;
+
+      newUser.is_admin = newUser.role === USER_ROLES.ADMIN;
+      newUser.is_manager = newUser.role === USER_ROLES.MANAGER;
+      newUser.is_driver = newUser.role === USER_ROLES.DRIVER;
       
       // Store token and user data
       setAuthToken(token);
-      saveToStorage(STORAGE_KEYS.TOKEN, token);
       saveToStorage(STORAGE_KEYS.USER, newUser);
       
       // Update state
@@ -218,7 +146,6 @@ export const AuthProvider = ({ children }) => {
         message: SUCCESS_MESSAGES.REGISTRATION_SUCCESS,
         user: newUser
       };
-      */
 
     } catch (error) {
       console.error(' Registration error:', error);
@@ -272,12 +199,16 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      // For mock: just update local storage
-      const updatedUser = { ...user, ...updatedData };
-      saveToStorage(STORAGE_KEYS.USER, updatedUser);
-      setUser(updatedUser);
+      const response = await api.patch('/auth/me/', updatedData);
+      const userData = response.data;
 
-      console.log('User updated:', updatedUser);
+      // Re-apply flags
+      userData.is_admin = userData.role === USER_ROLES.ADMIN;
+      userData.is_manager = userData.role === USER_ROLES.MANAGER;
+      userData.is_driver = userData.role === USER_ROLES.DRIVER;
+
+      saveToStorage(STORAGE_KEYS.USER, userData);
+      setUser(userData);
 
       return { success: true };
 
@@ -300,13 +231,12 @@ export const AuthProvider = ({ children }) => {
   /* VERIFY TOKEN FUNCTION */
   const verifyToken = async () => {
     try {
-      // For mock: just check if token exists
-      const token = getFromStorage(STORAGE_KEYS.TOKEN);
-      return !!token;
-
+      if (!getAuthToken()) return false;
+      await api.get('/auth/me/');
+      return true;
     } catch (error) {
       console.error('Token verification failed:', error);
-      logout();
+      // Do not auto-logout here to avoid loops, just return false
       return false;
     }
   };

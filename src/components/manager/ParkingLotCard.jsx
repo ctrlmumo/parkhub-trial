@@ -5,10 +5,10 @@ const ParkingLotCard = ({ lot, onManageSlots, onEdit, onDelete }) => {
   
   /* Format operating hours */
   const formatHours = () => {
-    if (lot.is24_7) {
+    if (lot.is_24_7) {
       return '24/7';
     }
-    return `${lot.openTime} - ${lot.closeTime}`;
+    return `${lot.open_time || 'N/A'} - ${lot.close_time || 'N/A'}`;
   };
 
   return (
@@ -25,8 +25,8 @@ const ParkingLotCard = ({ lot, onManageSlots, onEdit, onDelete }) => {
         <div className="lot-card-title-section">
           <h3 className="lot-card-title">{lot.name}</h3>
           <div className="lot-card-meta">
-            <span className="lot-slots-badge">{lot.totalSlots} slots</span>
-            <span className="lot-sections-badge">{lot.sections.length} sections</span>
+            <span className="lot-slots-badge">{lot.total_capacity} slots</span>
+            <span className="lot-sections-badge">{lot.sections?.length || 0} sections</span>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@ const ParkingLotCard = ({ lot, onManageSlots, onEdit, onDelete }) => {
         {/* Pricing */}
         <div className="lot-info-row">
           <DollarSign size={16} className="info-icon" />
-          <span className="info-text">KES {lot.hourlyRate}/hour</span>
+          <span className="info-text">KES {lot.hourly_rate}/hour</span>
         </div>
       </div>
 

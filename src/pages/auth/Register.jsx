@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Car, Shield, Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -9,7 +9,15 @@ import './Auth.css';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register, getDashboardPath } = useAuth();
+  const { register, isAuthenticated, user, getDashboardPath } = useAuth();
+
+  // Redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const dashboardPath = getDashboardPath();
+      navigate(dashboardPath, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate, getDashboardPath]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -106,9 +114,7 @@ const Register = () => {
       });
 
       if (success) {
-        // Success - redirect based on actual user account
-        const dashboardPath = getDashboardPath();
-        navigate(dashboardPath);
+        // Success - redirect handled by useEffect
       } else {
         // Show error
         setErrors({ submit: error || 'Registration failed. Please try again.' });

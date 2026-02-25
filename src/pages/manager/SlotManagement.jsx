@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, ChevronDown } from 'lucide-react';
+import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import ManagerNavbar from '../../components/manager/ManagerNavbar';
 import CreateLotModal from '../../components/manager/CreateLotModal';
 import ParkingLotCard from '../../components/manager/ParkingLotCard';
 import './SlotManagement.css';
 
 const SlotManagement = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [parkingLots, setParkingLots] = useState([]);
   const [selectedLot, setSelectedLot] = useState(null);
@@ -19,60 +22,49 @@ const SlotManagement = () => {
 
   /* Load manager's parking lots on mount */
   useEffect(() => {
-    loadParkingLots();
-  }, []);
+    if (user) {
+      loadParkingLots();
+    }
+  }, [user]);
 
   /* Load parking lots
    * TODO: Replace with API call */
   const loadParkingLots = async () => {
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Empty initially - no mock data
-      const mockLots = [];
+    try {
+      // Fetch lots managed by the current user
+      const response = await api.get(`/parking-lots/?manager=${user.id}`);
+      const lots = response.data;
+      setParkingLots(lots);
       
-      // TODO: Replace with real API call
-      // const response = await api.get('/manager/parking-lots');
-      // setParkingLots(response.data);
-      
-      setParkingLots(mockLots);
-      
-      if (mockLots.length > 0) {
-        setSelectedLot(mockLots[0]);
-        loadSlots(mockLots[0].id);
+      if (lots.length > 0 && !selectedLot) {
+        // Select first lot by default if none selected
+        // Don't auto-select if we just created one (handled by handleLotCreated)
+        // But here we might want to just let the user select
       }
-      
+    } catch (error) {
+      console.error("Failed to load parking lots", error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   /* Load slots for selected lot */
-  const loadSlots = (lotId) => {
-    // TODO: Replace with real API call
-    // const response = await api.get(`/parking-lots/${lotId}/slots`);
-    // setSlots(response.data);
-    
-    // For now, generate slots based on lot configuration
-    const lot = parkingLots.find(l => l.id === lotId);
-    if (!lot) return;
-    
-    const generatedSlots = [];
-    lot.sections.forEach(section => {
-      for (let i = 1; i <= lot.slotsPerSection; i++) {
-        const slotNumber = `${section}${i.toString().padStart(2, '0')}`;
-        generatedSlots.push({
-          id: `${lotId}-${slotNumber}`,
-          slotNumber: slotNumber,
-          section: `Section ${section}`,
-          status: 'available', //default
-          vehicle: null
-        });
-      }
-    });
-    
-    setSlots(generatedSlots);
-    setFilteredSlots(generatedSlots);
+  const loadSlots = async (lotId) => {
+    try {
+      const response = await api.get(`/parking-slots/?parking_lot=${lotId}`);
+      // Map API response to UI model if needed, or use directly
+      // API returns: { id, slot_number, section, status, ... }
+      // UI expects: { id, slotNumber, section, status, vehicle }
+      const mappedSlots = response.data.map(s => ({
+        ...s,
+        slotNumber: s.slot_number
+      }));
+      setSlots(mappedSlots);
+      setFilteredSlots(mappedSlots);
+    } catch (error) {
+      console.error("Failed to load slots", error);
+    }
   };
 
   /* Handle lot selection */
@@ -96,20 +88,22 @@ const SlotManagement = () => {
   };
 
   /* Handle delete lot */
-  const handleDeleteLot = (lot) => {
-    if (window.confirm(`Are you sure you want to delete "${lot.name}"?\n\nThis will delete all ${lot.totalSlots} slots and cannot be undone.`)) {
-      // Remove lot
-      setParkingLots(prev => prev.filter(l => l.id !== lot.id));
-      
-      // Clear selection if deleting selected lot
-      if (selectedLot?.id === lot.id) {
-        setSelectedLot(null);
-        setSlots([]);
-        setFilteredSlots([]);
+  const handleDeleteLot = async (lot) => {
+    if (window.confirm(`Are you sure you want to delete "${lot.name}"?\n\nThis will delete all ${lot.total_capacity} slots and cannot be undone.`)) {
+      try {
+        await api.delete(`/parking-lots/${lot.id}/`);
+        
+        // Remove lot from state
+        setParkingLots(prev => prev.filter(l => l.id !== lot.id));
+        
+        if (selectedLot?.id === lot.id) {
+          setSelectedLot(null);
+          setSlots([]);
+        }
+      } catch (error) {
+        console.error("Failed to delete lot", error);
+        alert("Failed to delete parking lot.");
       }
-      
-      // TODO: Call API to delete
-      // await api.delete(`/parking-lots/${lot.id}`);
     }
   };
 
@@ -134,12 +128,18 @@ const SlotManagement = () => {
   }, [searchQuery, statusFilter, slots]);
 
   /* Handle status change */
-  const handleStatusChange = (slotId, newStatus) => {
-    setSlots(prevSlots =>
-      prevSlots.map(slot =>
-        slot.id === slotId ? { ...slot, status: newStatus, vehicle: newStatus === 'available' ? null : slot.vehicle } : slot
-      )
-    );
+  const handleStatusChange = async (slotId, newStatus) => {
+    try {
+      await api.patch(`/parking-slots/${slotId}/`, { status: newStatus });
+      
+      setSlots(prevSlots =>
+        prevSlots.map(slot =>
+          slot.id === slotId ? { ...slot, status: newStatus } : slot
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update slot status", error);
+    }
   };
 
   /* Handle lot created */

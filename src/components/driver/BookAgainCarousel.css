@@ -1,278 +1,82 @@
-/* CAROUSEL SECTION */
-
-.book-again-carousel {
-  width: 100%;
-  margin-bottom: var(--spacing-2xl);
+.carousel-section {
+  margin-bottom: 1.5rem;
 }
 
-/* Header and arrow styles are inherited from NearYouCarousel.css */
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 
-/* SLOT CARD */
+.carousel-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
 
-.slot-card {
-  /* Size */
-  min-width: 260px;
-  width: 260px;
-  
-  /* Snap to grid */
-  scroll-snap-align: start;
-  
-  /* Visual */
-  background-color: var(--card);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  
-  /* Animation */
-  transition: all var(--transition-base);
+.carousel-view-all {
+  font-size: 0.875rem;
+  color: #2563eb;
+  background: none;
+  border: none;
   cursor: pointer;
-  
-  /* Prevent text selection while dragging */
-  user-select: none;
+  font-weight: 500;
 }
 
-.slot-card:hover {
-  box-shadow: var(--shadow-xl);
-  border-color: var(--primary);
-}
-
-/* SLOT BADGE (Top Section) */
-
-.slot-badge {
-  position: relative;
-  width: 100%;
-  padding: var(--spacing-xl);
-  
-  /* Gradient background */
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--accent) 100%
-  );
-  
+.carousel-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none; /* Firefox */
 }
 
-.slot-number-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: var(--primary-foreground);
+.carousel-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
-.slot-label {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  opacity: 0.9;
-}
-
-.slot-number {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  line-height: 1;
-}
-
-/* FAVORITE BADGE */
-
-.favorite-badge {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  
-  padding: 4px 10px;
-  border-radius: 12px;
-  
-  background-color: hsla(0, 0%, 0%, 0.3);
-  backdrop-filter: blur(4px);
-  color: white;
-  
-  font-size: var(--text-xs);
-  font-weight: 600;
-  
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* SLOT CARD CONTENT */
-
-.slot-card-content {
-  padding: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-/* INFO ROWS */
-
-.slot-info-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--text-sm);
-  color: var(--foreground);
-}
-
-.slot-icon {
-  color: var(--muted-foreground);
+.carousel-item {
+  min-width: 200px;
+  max-width: 200px;
   flex-shrink: 0;
 }
 
-.slot-lot-name {
+.carousel-item-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.carousel-item-title {
+  font-size: 1rem;
   font-weight: 600;
-  
-  /* Truncate */
+  color: #1f2937;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.slot-date {
-  color: var(--muted-foreground);
-}
-
-/* BOOKING COUNT */
-
-.slot-booking-count {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-  margin: 0;
-  font-style: italic;
-}
-
-/* AVAILABILITY STATUS */
-
-.slot-status {
+.carousel-item-detail {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: calc(var(--radius) * 0.5);
-  
-  font-size: var(--text-xs);
-  font-weight: 600;
-  
-  margin-top: var(--spacing-xs);
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+.carousel-icon {
   flex-shrink: 0;
 }
 
-/* Available Status - Green */
-.slot-status.available {
-  background-color: hsl(142, 60%, 95%);
-  color: hsl(142, 60%, 35%);
+.carousel-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.slot-status.available .status-dot {
-  background-color: hsl(142, 60%, 50%);
-  box-shadow: 0 0 6px hsl(142, 60%, 50%);
-}
-
-/* Occupied Status - Red */
-.slot-status.occupied {
-  background-color: hsl(0, 65%, 95%);
-  color: hsl(0, 65%, 35%);
-}
-
-.slot-status.occupied .status-dot {
-  background-color: hsl(0, 65%, 55%);
-  box-shadow: 0 0 6px hsl(0, 65%, 55%);
-}
-
-/* QUICK BOOK BUTTON */
-
-.slot-card-button {
-  /* Reset */
-  background: none;
-  border: none;
-  cursor: pointer;
-  
-  /* Styling */
-  padding: var(--spacing-sm) var(--spacing-md);
-  margin-top: var(--spacing-sm);
-  border-radius: calc(var(--radius) * 0.75);
-  
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  
-  /* Animation */
-  transition: all var(--transition-base);
-}
-
-.slot-card-button:hover:not(.disabled) {
-  background-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.slot-card-button:active:not(.disabled) {
-  transform: translateY(0);
-}
-
-/* Disabled Button (when slot is occupied) */
-.slot-card-button.disabled {
-  background-color: var(--muted);
-  color: var(--muted-foreground);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* RESPONSIVE DESIGN */
-
-@media (max-width: 768px) {
-  /* Smaller cards on mobile */
-  .slot-card {
-    min-width: 220px;
-    width: 220px;
-  }
-  
-  .slot-badge {
-    padding: var(--spacing-lg);
-  }
-  
-  .slot-number {
-    font-size: var(--text-2xl);
-  }
-  
-  .slot-card-content {
-    padding: var(--spacing-md);
-  }
-}
-
-/* DARK MODE SUPPORT */
-
-.dark .slot-card {
-  background-color: var(--card);
-  border-color: var(--border);
-}
-
-.dark .slot-card:hover {
-  border-color: var(--primary);
-}
-
-.dark .slot-status.available {
-  background-color: hsl(142, 60%, 15%);
-  color: hsl(142, 60%, 70%);
-}
-
-.dark .slot-status.occupied {
-  background-color: hsl(0, 65%, 15%);
-  color: hsl(0, 65%, 70%);
+.carousel-action-btn {
+  margin-top: 0.5rem;
+  width: 100%;
 }

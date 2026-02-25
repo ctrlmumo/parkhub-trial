@@ -23,6 +23,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import api from '../../services/api';
 import ManagerNavbar from '../../components/manager/ManagerNavbar';
 import './ManagerDashboard.css';
 
@@ -55,64 +56,19 @@ const ManagerDashboard = () => {
    * Load all dashboard data
    * TODO: Replace with API calls
    */
-  const loadDashboardData = () => {
-    // TODO: Replace with real API calls
-    // const response = await api.get('/manager/dashboard/stats');
-    // setStats(response.data);
-    
-    // Mock stats - COMMENTED OUT
-    // setStats({
-    //   totalSlots: 160,
-    //   occupancyRate: 68,
-    //   todaysRevenue: 12450,
-    //   activeUsers: 234
-    // });
-
-    // Mock revenue data (hourly today) - COMMENTED OUT
-    // setRevenueData([
-    //   { time: '00:00', revenue: 450 },
-    //   { time: '03:00', revenue: 320 },
-    //   { time: '06:00', revenue: 850 },
-    //   { time: '09:00', revenue: 1200 },
-    //   { time: '12:00', revenue: 1450 },
-    //   { time: '15:00', revenue: 1320 },
-    //   { time: '18:00', revenue: 1650 },
-    //   { time: '21:00', revenue: 980 }
-    // ]);
-
-    // Mock weekly occupancy - COMMENTED OUT
-    // setOccupancyData([
-    //   { day: 'Mon', rate: 72 },
-    //   { day: 'Tue', rate: 68 },
-    //   { day: 'Wed', rate: 75 },
-    //   { day: 'Thu', rate: 82 },
-    //   { day: 'Fri', rate: 88 },
-    //   { day: 'Sat', rate: 65 },
-    //   { day: 'Sun', rate: 58 }
-    // ]);
-
-    // Mock slot distribution - COMMENTED OUT
-    // setSlotDistribution([
-    //   { name: 'Available', value: 51, color: 'hsl(142, 70%, 50%)' },
-    //   { name: 'Occupied', value: 89, color: 'hsl(0, 70%, 50%)' },
-    //   { name: 'Reserved', value: 18, color: 'hsl(38, 95%, 50%)' },
-    //   { name: 'Maintenance', value: 2, color: 'hsl(215, 15%, 50%)' }
-    // ]);
-
-    // Mock recent bookings - COMMENTED OUT
-    // const mockBookings = [];
-    // for (let i = 1; i <= 12; i++) {
-    //   mockBookings.push({
-    //     id: i,
-    //     slot: `A${(10 + i).toString().padStart(2, '0')}`,
-    //     vehicle: `KCA ${Math.floor(Math.random() * 900 + 100)}B`,
-    //     duration: `${Math.floor(Math.random() * 5 + 1)}h`,
-    //     amount: Math.floor(Math.random() * 300 + 100),
-    //     status: Math.random() > 0.2 ? 'paid' : 'pending',
-    //     time: `${Math.floor(Math.random() * 12 + 1)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')} ${Math.random() > 0.5 ? 'AM' : 'PM'}`
-    //   });
-    // }
-    // setRecentBookings(mockBookings);
+  const loadDashboardData = async () => {
+    try {
+      const response = await api.get('/dashboard/manager/');
+      const data = response.data;
+      
+      setStats(data.stats);
+      setRevenueData(data.revenueData);
+      setOccupancyData(data.occupancyData);
+      setSlotDistribution(data.slotDistribution);
+      setRecentBookings(data.recentBookings);
+    } catch (error) {
+      console.error("Failed to load dashboard data", error);
+    }
   };
 
   /**

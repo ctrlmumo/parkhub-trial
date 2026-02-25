@@ -10,10 +10,19 @@ import './Auth.css';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated, getDashboardPath } = useAuth();
+  const { login, isAuthenticated, user, getDashboardPath } = useAuth();
 
   // Get the page user was trying to access before being redirected to login
   const from = location.state?.from?.pathname || null;
+
+  // Redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const dashboardPath = getDashboardPath();
+      const targetPath = from || dashboardPath;
+      navigate(targetPath, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate, from, getDashboardPath]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -89,17 +98,7 @@ const Login = () => {
 
       if (success) {
         console.log('Login successful! Redirecting...');
-
-        // Small delay to ensure state is updated
-        setTimeout(() => {
-          // Use the dashboard helper or the 'from' path
-          const dashboardPath = getDashboardPath();
-          const targetPath = from || dashboardPath;
-
-          console.log(`Redirecting to: ${targetPath}`);
-          navigate(targetPath, { replace: true });
-        }, 100);
-
+        // Navigation is handled by useEffect
       } else {
         // Show error
         console.log('Login failed:', error);
