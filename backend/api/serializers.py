@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import ParkingLot, ParkingSlot, Booking, Payment, Review
+from .models import ParkingLot, ParkingSlot, Booking, Payment, Review, AuditLog
 
 User = get_user_model()
 
@@ -31,4 +31,10 @@ class BookingSerializer(serializers.ModelSerializer):
     slot_details = ParkingSlotSerializer(source='parking_slot', read_only=True)
     class Meta:
         model = Booking
+        fields = '__all__'
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    user_details = UserSerializer(source='user', read_only=True)
+    class Meta:
+        model = AuditLog
         fields = '__all__'

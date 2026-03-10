@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../../services/api';
 import { 
   CircleDollarSign, 
   TrendingUp,
@@ -33,7 +34,15 @@ const Analytics = () => {
   const [bookingData, setBookingData] = useState([]);
   const [userData, setUserData] = useState([]);
   const [lotData, setLotData] = useState([]);
+  const [paymentMethodData, setPaymentMethodData] = useState([]);
+  const [peakHoursData, setPeakHoursData] = useState([]);
+  const [userActivityData, setUserActivityData] = useState([]);
+  const [occupancyData, setOccupancyData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Colors for Pie Charts
+  const PIE_COLORS = ['hsl(var(--primary-h) var(--primary-s) var(--primary-l))', 'hsl(142, 70%, 50%)', 'hsl(38, 95%, 50%)', 'hsl(0, 70%, 50%)'];
 
   /* Load analytics data */
   useEffect(() => {
@@ -42,27 +51,72 @@ const Analytics = () => {
 
   /**
    * Load all analytics data
-   * TODO: Replace with API calls
    */
-  const loadAnalyticsData = () => {
-    setTimeout(() => {
-      // TODO: Replace with real API calls
-      // const response = await api.get('/admin/analytics');
-      // setRevenueData(response.data.revenue);
-      // etc...
-      
-      // All data remains empty (empty state)
+  const loadAnalyticsData = async () => {
+    setLoading(true);
+    try {
+      const [
+        revenueRes, bookingRes, userRes, lotRes,
+        paymentMethodRes, peakHoursRes, userActivityRes, occupancyRes
+      ] = await Promise.all([
+        api.get('/admin/analytics/revenue-over-time/'),
+        api.get('/admin/analytics/booking-trends/'),
+        api.get('/admin/analytics/user-growth/'),
+        api.get('/admin/analytics/top-lots/'),
+        api.get('/admin/analytics/revenue-by-payment-method/'),
+        api.get('/admin/analytics/peak-hours/'),
+        api.get('/admin/analytics/user-activity/'),
+        api.get('/admin/analytics/occupancy-overview/')
+      ]).catch(err => {
+          console.error("An API call for analytics failed:", err);
+          // Return an array of empty objects to avoid destructuring errors
+          return Array(8).fill({});
+      });
+
+      setRevenueData(revenueRes.data || []);
+      setBookingData(bookingRes.data || []);
+      setUserData(userRes.data || []);
+      setLotData(lotRes.data || []);
+      setPaymentMethodData(paymentMethodRes.data || []);
+      setPeakHoursData(peakHoursRes.data || []);
+      setUserActivityData(userActivityRes.data || []);
+      setOccupancyData(occupancyRes.data || []);
+
+    } catch (error) {
+      console.error("Failed to load analytics data:", error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  };
+
+  const downloadFile = (data, filename) => {
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   /* Export handlers */
-  const handleExportPDF = () => {
-    alert('Export to PDF\n\nPDF generation coming soon!');
-  };
-
-  const handleExportExcel = () => {
-    alert('Export to Excel\n\nExcel export coming soon!');
+  const handleExport = async (format) => {
+    if (isExporting) return;
+    setIsExporting(true);
+    const fileExtension = format === 'pdf' ? 'pdf' : 'xlsx';
+    try {
+      const response = await api.get(`/admin/export-analytics/?format=${fileExtension}`, {
+        responseType: 'blob',
+      });
+      const filename = `parkhub_analytics_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
+      downloadFile(response.data, filename);
+    } catch (error) {
+      console.error(`Error exporting to ${format.toUpperCase()}:`, error);
+      alert(`Failed to generate ${format.toUpperCase()} report. Please try again.`);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   /* Custom tooltip */
@@ -106,13 +160,13 @@ const Analytics = () => {
             <p className="page-subtitle">Platform-wide insights and data</p>
           </div>
           <div className="export-buttons">
-            <button onClick={handleExportPDF} className="export-btn">
+            <button onClick={() => handleExport('pdf')} className="export-btn" disabled={isExporting}>
               <FileText size={18} />
-              <span>Export PDF</span>
+              <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
             </button>
-            <button onClick={handleExportExcel} className="export-btn">
+            <button onClick={() => handleExport('excel')} className="export-btn" disabled={isExporting}>
               <Download size={18} />
-              <span>Export Excel</span>
+              <span>{isExporting ? 'Exporting...' : 'Export Excel'}</span>
             </button>
           </div>
         </div>
@@ -169,11 +223,37 @@ const Analytics = () => {
                 <h3 className="chart-title">Revenue by Payment Method</h3>
                 <p className="chart-subtitle">Payment distribution</p>
               </div>
-              <div className="chart-empty-state">
-                <CircleDollarSign size={48} className="empty-icon" />
-                <p className="empty-text">No payment data</p>
-                <p className="empty-subtext">Payment method breakdown will appear here</p>
-              </div>
+              {paymentMethodData.length > 0 ? (
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={paymentMethodData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {paymentMethodData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `KES ${value.toLocaleString()}`} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="chart-empty-state">
+                  <CircleDollarSign size={48} className="empty-icon" />
+                  <p className="empty-text">No payment data</p>
+                  <p className="empty-subtext">Payment method breakdown will appear here</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -224,11 +304,25 @@ const Analytics = () => {
                 <h3 className="chart-title">Peak Hours Analysis</h3>
                 <p className="chart-subtitle">Busiest booking times</p>
               </div>
-              <div className="chart-empty-state">
-                <TrendingUp size={48} className="empty-icon" />
-                <p className="empty-text">No usage data</p>
-                <p className="empty-subtext">Peak hours analysis will appear here</p>
-              </div>
+              {peakHoursData.length > 0 ? (
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={peakHoursData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="hour" stroke="hsl(var(--muted-foreground))" style={{ fontSize: '12px' }} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" style={{ fontSize: '12px' }} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Bar dataKey="bookings" fill="hsl(38, 95%, 50%)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="chart-empty-state">
+                  <TrendingUp size={48} className="empty-icon" />
+                  <p className="empty-text">No usage data</p>
+                  <p className="empty-subtext">Peak hours analysis will appear here</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -285,11 +379,37 @@ const Analytics = () => {
                 <h3 className="chart-title">User Activity</h3>
                 <p className="chart-subtitle">Active vs inactive users</p>
               </div>
-              <div className="chart-empty-state">
-                <Users size={48} className="empty-icon" />
-                <p className="empty-text">No activity data</p>
-                <p className="empty-subtext">User activity data will appear here</p>
-              </div>
+              {userActivityData.length > 0 ? (
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={userActivityData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {userActivityData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="chart-empty-state">
+                  <Users size={48} className="empty-icon" />
+                  <p className="empty-text">No activity data</p>
+                  <p className="empty-subtext">User activity data will appear here</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -337,14 +457,40 @@ const Analytics = () => {
             {/* Average Occupancy */}
             <div className="chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">Average Occupancy Rate</h3>
+                <h3 className="chart-title">Current Slot Occupancy</h3>
                 <p className="chart-subtitle">Across all lots</p>
               </div>
-              <div className="chart-empty-state">
-                <TrendingUp size={48} className="empty-icon" />
-                <p className="empty-text">No occupancy data</p>
-                <p className="empty-subtext">Occupancy trends will appear here</p>
-              </div>
+              {occupancyData.length > 0 ? (
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={occupancyData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {occupancyData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.name === 'Occupied' ? PIE_COLORS[3] : PIE_COLORS[1]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="chart-empty-state">
+                  <TrendingUp size={48} className="empty-icon" />
+                  <p className="empty-text">No occupancy data</p>
+                  <p className="empty-subtext">Occupancy trends will appear here</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
