@@ -70,8 +70,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'parkhub_db',
-        'USER': 'root',            # Update if your MySQL user is different
-        'PASSWORD': 'Amaniki#12',    # Update with your MySQL password ok glo
+        'USER': 'root',
+        'PASSWORD': '',    
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

@@ -1,13 +1,6 @@
--- ============================================================================
--- ParkHub Database Schema (Refined)
--- ============================================================================
--- Three-role system: Driver, Manager, Admin
--- Includes: Users, Parking Lots, Slots, Bookings, Payments, Reviews, Settings
--- ============================================================================
 
--- ============================================================================
+
 -- USERS TABLE
--- ============================================================================
 CREATE TABLE users (
   id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(100) NOT NULL,
@@ -30,9 +23,8 @@ CREATE TABLE users (
   INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- PARKING LOTS TABLE
--- ============================================================================
 CREATE TABLE parking_lots (
   id INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
@@ -77,15 +69,14 @@ CREATE TABLE parking_lots (
   INDEX idx_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- PARKING SLOTS TABLE
--- ============================================================================
 CREATE TABLE parking_slots (
   id INT PRIMARY KEY AUTO_INCREMENT,
   parking_lot_id INT NOT NULL,
   slot_number VARCHAR(20) NOT NULL,
   
-  -- Section (e.g., A, B, C)
+  -- Section
   section VARCHAR(10),
   
   -- Status
@@ -112,9 +103,7 @@ CREATE TABLE parking_slots (
   INDEX idx_slot_section (section)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
 -- BOOKINGS TABLE 
--- ============================================================================
 CREATE TABLE bookings (
   id INT PRIMARY KEY AUTO_INCREMENT,
   
@@ -165,9 +154,8 @@ CREATE TABLE bookings (
   INDEX idx_booking_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- PAYMENTS TABLE
--- ============================================================================
 CREATE TABLE payments (
   id INT PRIMARY KEY AUTO_INCREMENT,
   
@@ -202,9 +190,8 @@ CREATE TABLE payments (
   INDEX idx_transaction_id (transaction_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- REVIEWS TABLE
--- ============================================================================
 CREATE TABLE reviews (
   id INT PRIMARY KEY AUTO_INCREMENT,
   
@@ -239,9 +226,8 @@ CREATE TABLE reviews (
   INDEX idx_review_rating (rating)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- SYSTEM SETTINGS TABLE
--- ============================================================================
 CREATE TABLE system_settings (
   setting_key VARCHAR(100) PRIMARY KEY,
   setting_value TEXT NOT NULL,
@@ -249,9 +235,8 @@ CREATE TABLE system_settings (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- AUDIT LOGS TABLE
--- ============================================================================
 CREATE TABLE audit_logs (
   id INT PRIMARY KEY AUTO_INCREMENT,
   
@@ -283,9 +268,8 @@ CREATE TABLE audit_logs (
   INDEX idx_log_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================================
+
 -- INSERT DEFAULT SYSTEM SETTINGS
--- ============================================================================
 INSERT INTO system_settings (setting_key, setting_value, description) VALUES
 ('platform_name', 'ParkHub', 'Platform name'),
 ('default_hourly_rate', '50', 'Default hourly parking rate (KES)'),
