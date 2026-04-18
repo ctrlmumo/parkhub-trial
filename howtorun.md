@@ -18,3 +18,7 @@ npm install
 npm run dev
 
 note :  always activate the virtual environment with venv\Scripts\activate before running npm run dev
+
+
+btw everytime you download a new library, for ease of collaboration update the requirements.txt file. by :
+pip freeze > requirements.txt

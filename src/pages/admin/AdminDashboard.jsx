@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import { 
   Users, 
   Building2, 
@@ -11,6 +12,7 @@ import {
   FileText,
   Activity
 } from 'lucide-react';
+import { formatDateTime, capitalize } from '../../utils/helpers';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import './AdminDashboard.css';
 
@@ -36,19 +38,43 @@ const AdminDashboard = () => {
 
   /**
    * Load all dashboard data
-   * TODO: Replace with API calls
    */
-  const loadDashboardData = () => {
-    setTimeout(() => {
-      // TODO: Replace with real API calls
-      // const response = await api.get('/admin/dashboard/stats');
-      // setStats(response.data);
-      
-      // All stats remain at 0 (empty state)
-      // Recent activity remains empty
-      
+  const loadDashboardData = async () => {
+    setLoading(true);
+    try {
+      // Use Promise.allSettled to allow partial success (e.g. if audit logs fail, stats still load)
+      const [statsResult, activityResult] = await Promise.allSettled([
+        api.get('/admin/stats/'),
+        api.get('/admin/audit-logs/', { params: { limit: 5 } })
+      ]);
+
+      // Handle Stats Response
+      if (statsResult.status === 'fulfilled' && statsResult.value.data) {
+        setStats(statsResult.value.data);
+      } else {
+        console.error("Failed to load dashboard stats:", statsResult.reason);
+      }
+
+      // Handle Activity Response
+      if (activityResult.status === 'fulfilled' && activityResult.value.data && Array.isArray(activityResult.value.data.results)) {
+        const transformedActivity = activityResult.value.data.results.map(log => ({
+          id: log.id,
+          time: formatDateTime(log.created_at),
+          user: log.user?.username || 'System',
+          action: log.action ? capitalize(log.action.toLowerCase().replace(/_/g, ' ')) : 'Unknown',
+          actionType: log.action ? log.action.toLowerCase().split('_')[0] : 'info',
+          entity: log.entity_type || 'N/A',
+          details: `${log.entity_type || ''} ID: ${log.entity_id || ''}`.trim()
+        }));
+        setRecentActivity(transformedActivity);
+      } else {
+        console.error("Failed to load recent activity:", activityResult.reason);
+      }
+    } catch (error) {
+      console.error("Failed to load dashboard data:", error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   /* Quick action handlers */
@@ -139,7 +165,7 @@ const AdminDashboard = () => {
           <div className="stat-card">
             <div className="stat-content">
               <p className="stat-label">Platform Revenue</p>
-              <p className="stat-value">KES {stats.platformRevenue.toLocaleString()}</p>
+              <p className="stat-value">KES {(stats.platformRevenue || 0).toLocaleString()}</p>
               <p className="stat-sublabel">Total earnings</p>
             </div>
             <div className="stat-icon stat-icon-green">
