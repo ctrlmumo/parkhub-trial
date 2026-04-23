@@ -185,19 +185,20 @@ const Register = () => {
           )}
 
           {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="auth-form">
+          <form onSubmit={handleSubmit} className="auth-form" autoComplete="off">
             {/* Full Name */}
             <Input
-              label="Full Name"
+              label="Username"
               type="text"
               name="username"
-              placeholder="John Doe"
+              placeholder="johndoe"
               value={formData.username}
               onChange={handleChange}
               error={errors.username}
               icon={<User size={18} />}
               iconPosition="left"
               disabled={loading}
+              autoComplete="off"
               required
             />
 
@@ -213,6 +214,7 @@ const Register = () => {
               icon={<Mail size={18} />}
               iconPosition="left"
               disabled={loading}
+              autoComplete="off"
               required
             />
 
@@ -222,7 +224,7 @@ const Register = () => {
                 label="Phone Number"
                 type="tel"
                 name="phoneNumber"
-                placeholder="254712345678"
+                placeholder="0712345678"
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 error={errors.phoneNumber}
@@ -261,6 +263,7 @@ const Register = () => {
               icon={<Lock size={18} />}
               iconPosition="left"
               disabled={loading}
+              autoComplete="new-password"
               required
             />
 
@@ -276,6 +279,7 @@ const Register = () => {
               icon={<Lock size={18} />}
               iconPosition="left"
               disabled={loading}
+              autoComplete="new-password"
               required
             />
 
