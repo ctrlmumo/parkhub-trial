@@ -154,11 +154,6 @@ const DriverDashboard = () => {
                 Where are you heading today?
               </p>
             </div>
-            
-            <div className="location-badge">
-              <MapPin className="location-icon" />
-              <span>ParkHub Central - Nairobi</span>
-            </div>
           </div>
 
           {/* Search Bar */}
