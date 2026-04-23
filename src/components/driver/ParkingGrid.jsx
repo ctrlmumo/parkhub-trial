@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CircleCheck, Car, Clock, Wrench, Zap, ArrowDown, ArrowUp } from 'lucide-react';
+import api from '../../services/api';
 import './ParkingGrid.css';
 
 const ParkingGrid = ({ onSlotSelect, lotData }) => {
@@ -20,37 +21,36 @@ const ParkingGrid = ({ onSlotSelect, lotData }) => {
   const sections = ['all', 'A', 'B', 'C', 'D'];
 
   /**
-   * Load parking slots on mount
-   * TODO: Replace with actual API call
+   * Fetch real parking slots from the Django API when the component mounts
+   * or when the lotData changes.
    */
   useEffect(() => {
-    // Mock data with EV charging stations
-    const mockSlots = [];
-    const sections = ['A', 'B', 'C', 'D'];
-    const statuses = ['available', 'occupied', 'reserved', 'maintenance'];
-    
-    // Define which slots have EV charging (every 5th slot in each section)
-    const chargingSlots = [5, 10, 15];
-    
-    sections.forEach(section => {
-      for (let i = 1; i <= 20; i++) {
-        const slotNum = `${section}${i.toString().padStart(2, '0')}`;
-        const statusIndex = Math.floor(Math.random() * statuses.length);
-        const hasCharging = chargingSlots.includes(i);
+    const fetchSlots = async () => {
+      // Don't attempt to fetch if we don't have a valid lot ID yet
+      if (!lotData?.id) return;
+      
+      try {
+        // Fetch slots filtered by the current parking lot
+        const response = await api.get(`/parking-slots/?parking_lot=${lotData.id}`);
         
-        mockSlots.push({
-          id: slotNum,
-          number: slotNum,
-          section: section,
-          status: statuses[statusIndex],
-          hasCharging: hasCharging,
-          rate: hasCharging ? 60 : 50 // Higher rate for charging slots
-        });
+        // Map the backend data to match the frontend expected format
+        const fetchedSlots = response.data.map(slot => ({
+          id: slot.id, // IMPORTANT: The real database primary key needed for booking
+          number: slot.slot_number,
+          section: slot.section || 'A', // Fallback to 'A' if section is null
+          status: slot.status,
+          hasCharging: slot.is_ev_charging,
+          rate: lotData.pricing?.hourly || 50
+        }));
+        
+        setSlots(fetchedSlots);
+      } catch (error) {
+        console.error("Failed to fetch slots:", error);
       }
-    });
+    };
 
-    setSlots(mockSlots);
-  }, []);
+    fetchSlots();
+  }, [lotData]);
 
   /**
    * Calculate stats when slots change
@@ -157,17 +157,6 @@ const ParkingGrid = ({ onSlotSelect, lotData }) => {
             <p className="stat-label">Maintenance</p>
           </div>
         </div>
-
-        {/* EV Charging */}
-        <div className="stat-card stat-charging">
-          <div className="stat-icon-container stat-icon-charging">
-            <Zap className="stat-icon" />
-          </div>
-          <div className="stat-content">
-            <p className="stat-count">{stats.charging}</p>
-            <p className="stat-label">EV Charging</p>
-          </div>
-        </div>
       </div>
 
       {/* Section Filters */}
@@ -189,12 +178,6 @@ const ParkingGrid = ({ onSlotSelect, lotData }) => {
       <div className="slots-container">
         <div className="slots-header">
           <h3 className="slots-title">Select Your Parking Slot</h3>
-          <p className="slots-subtitle">
-            {selectedSection === 'all' 
-              ? 'Satellite view - showing all parking sections'
-              : `Showing Section ${selectedSection} parking slots`
-            }
-          </p>
         </div>
 
         {/* Satellite Layout */}

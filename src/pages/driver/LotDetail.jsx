@@ -8,6 +8,7 @@
  * - Booking modal integration
  */
 
+import api from '../../services/api'
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -39,45 +40,46 @@ const LotDetail = () => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
-  /**
-   * Load lot details
-   * TODO: Replace with actual API call
-   */
+  /* Load lot details */
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      // Mock lot data
-      const mockLot = {
-        id: parseInt(lotId),
-        name: "Main Campus Parking Lot",
-        location: "University Way, Nairobi",
-        address: "123 University Way, Nairobi, Kenya",
-        coordinates: { lat: -1.2921, lng: 36.8219 },
-        distance: 0.8, // km 
-        rating: 4.5,
-        reviews: 127,
-        hours: "24/7",
-        phone: "+254 700 123 456",
-        amenities: [
-          { icon: Camera, label: "CCTV Surveillance" },
-          { icon: Zap, label: "EV Charging" },
-          { icon: Shield, label: "24/7 Security" },
-          { icon: Wifi, label: "Free WiFi" },
-          { icon: Users, label: "Wheelchair Access" },
-          { icon: Shield, label: "Covered Parking" }
-        ],
-        pricing: {
-          hourly: 50,
-          daily: 400,
-          monthly: 8000
-        },
-        totalSlots: 80,
-        description: " "
-      };
-      
-      setLot(mockLot);
-      setLoading(false);
-    }, 800);
+    const fetchLotDetail = async () => {
+      try {
+        const response = await api.get(`/parking-lots/${lotId}/`);
+        const data = response.data;
+        
+        // Parse the JSON string amenities safely
+        let parsedAmenities = [];
+        try {
+          if (data.amenities) {
+            parsedAmenities = JSON.parse(data.amenities).map(a => ({ label: a, icon: Shield }));
+          }
+        } catch(e) {}
+
+        setLot({
+          id: data.id,
+          name: data.name,
+          location: data.location,
+          rating: 4.5,
+          reviews: 120,
+          hours: data.is_24_7 ? "24/7" : `${data.open_time} - ${data.close_time}`,
+          phone: "+254 700 123 456",
+          amenities: parsedAmenities.length ? parsedAmenities : [{ icon: Shield, label: "Security" }],
+          pricing: {
+            hourly: data.hourly_rate,
+            daily: data.hourly_rate * 8, // calculated mock
+            monthly: data.hourly_rate * 160
+          },
+          totalSlots: data.total_capacity,
+          description: "Secure and convenient parking."
+        });
+      } catch (error) {
+        console.error('Failed to fetch lot details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLotDetail();
   }, [lotId]);
 
   /* Handle slot selection from ParkingGrid */
@@ -155,25 +157,12 @@ const LotDetail = () => {
               </div>
             </div>
           </div>
-          
-          <div className="lot-header-right">
-            <div className="lot-rating">
-              <Star size={18} fill="currentColor" />
-              <span className="rating-value">{lot.rating}</span>
-              <span className="rating-count">({lot.reviews} reviews)</span>
-            </div>
-            <div className="lot-distance">
-              <MapPin size={16} />
-              <span>{lot.distance} km away</span>
-            </div>
-          </div>
         </div>
 
         {/* LOT INFO CARD */}
         <Card className="lot-info-card">
           <Card.Header>
             <Card.Title>Parking Lot Information</Card.Title>
-            <Card.Description>{lot.description}</Card.Description>
           </Card.Header>
           
           <Card.Content>
@@ -231,19 +220,6 @@ const LotDetail = () => {
                 </div>
               </div>
 
-            </div>
-
-            {/* Amenities */}
-            <div className="amenities-section">
-              <h4 className="amenities-title">Amenities & Features</h4>
-              <div className="amenities-grid">
-                {lot.amenities.map((amenity, index) => (
-                  <div key={index} className="amenity-item">
-                    <amenity.icon size={18} className="amenity-icon" />
-                    <span className="amenity-label">{amenity.label}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </Card.Content>
         </Card>

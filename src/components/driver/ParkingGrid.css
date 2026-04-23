@@ -10,8 +10,8 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
 }
 
 @media (min-width: 768px) {
@@ -28,11 +28,6 @@
   padding: var(--spacing-md);
   border-radius: calc(var(--radius) * 1.5);
   border: 2px solid;
-  transition: transform var(--transition-fast);
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
 }
 
 /* Stat Variants */
@@ -63,8 +58,8 @@
 
 /* Icon Container */
 .stat-icon-container {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -289,7 +284,7 @@
   animation: bounce-up 2s ease-in-out infinite;
 }
 
-/* Pulse animations for entry/exit */
+/* Pulse animations for entry/exit 
 .entry-pulse,
 .exit-pulse {
   position: absolute;
@@ -297,19 +292,19 @@
   height: 40px;
   border-radius: 50%;
   opacity: 0.3;
-}
+}*/
 
 .entry-pulse {
   background: hsl(142, 70%, 45%);
-  animation: pulse-green 2s ease-out infinite;
+  /*animation: pulse-green 2s ease-out infinite;*/
 }
 
 .exit-pulse {
   background: hsl(217, 70%, 45%);
-  animation: pulse-blue 2s ease-out infinite;
+  /*animation: pulse-blue 2s ease-out infinite;*/
 }
 
-@keyframes bounce-down {
+/*@keyframes bounce-down {
   0%, 100% {
     transform: translateY(0);
   }
@@ -355,7 +350,7 @@
     transform: scale(0.8);
     opacity: 0.3;
   }
-}
+}*/
 
 /* Road Lines */
 .road-line {

@@ -7,6 +7,8 @@
 import { useState } from 'react';
 import { X, Car, Clock, CreditCard, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import { DURATION_OPTIONS, HOURLY_RATE } from '../../utils/constants';
@@ -14,6 +16,7 @@ import { formatPrice } from '../../utils/helpers';
 import './BookingModal.css';
 
 const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
+  const { user } = useAuth(); // gets the logged-in user
   
   // Multi-step state
   const [step, setStep] = useState(1); // 1: Details, 2: Duration, 3: Payment, 4: Success
@@ -109,15 +112,38 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
   const handlePayment = async () => {
     setPaymentLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // Generate booking reference
+    try {
       const ref = `PH${Date.now().toString().slice(-8)}`;
-      setBookingReference(ref);
       
-      setPaymentLoading(false);
+      // 1. Create the booking in the database
+      const payload = {
+        user: user.id,
+        parking_slot: slot.id, // Uses the real database ID we fixed in ParkingGrid
+        start_time: formData.startTime.toISOString(),
+        end_time: calculateEndTime().toISOString(),
+        duration_hours: formData.duration,
+        vehicle_number: formData.vehicleNumber,
+        hourly_rate: HOURLY_RATE,
+        total_amount: calculateCost(),
+        booking_reference: ref,
+        status: 'active'
+      };
+      
+      await api.post('/bookings/', payload);
+      
+      // 2. Update the slot status to occupied
+      await api.patch(`/parking-slots/${slot.id}/`, {
+        status: 'occupied'
+      });
+
+      setBookingReference(ref);
       setStep(4);
-    }, 2500);
+    } catch (error) {
+      console.error("Booking failed:", error);
+      alert("Booking failed. Ensure the slot is still available.");
+    } finally {
+      setPaymentLoading(false);
+    }
   };
 
   /**
