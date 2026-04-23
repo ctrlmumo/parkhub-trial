@@ -135,7 +135,6 @@ const Login = () => {
             <Car size={32} strokeWidth={2.5} />
           </div>
           <h1 className="logo-text">ParkHub</h1>
-          <p className="logo-subtitle">Smart Parking Management</p>
         </div>
 
         {/* Login Card */}
@@ -244,7 +243,7 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Demo Credentials (Development Only) */}
+          {/* Demo Credentials (Development Only) 
           {import.meta.env.DEV && (
             <div className="demo-credentials">
               <p className="demo-title">Quick Login (Demo):</p>
@@ -278,7 +277,7 @@ const Login = () => {
                 Click to auto-fill credentials
               </p>
             </div>
-          )}
+          )}*/}
         </div>
 
         {/* Footer */}
