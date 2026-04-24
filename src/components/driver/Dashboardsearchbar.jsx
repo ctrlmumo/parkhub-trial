@@ -78,10 +78,7 @@ const DashboardSearchBar = () => {
   return (
     <div className="dashboard-search-section">
       {/* Main Search Bar */}
-      <div className="search-bar-container">
-        {/* Search Icon */}
-        <Search className="search-icon" size={20} />
-        
+      <div className="search-bar-container">        
         {/* Search Input */}
         <input
           type="text"
