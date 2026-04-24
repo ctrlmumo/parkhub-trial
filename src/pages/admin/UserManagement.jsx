@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, MoreVertical, Edit2, Ban, Trash2, Eye } from 'lucide-react';
+import { Search, Filter, ChevronDown, MoreVertical, Edit2, Ban, Trash2, Eye, CheckCircle } from 'lucide-react';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import './UserManagement.css';
 import api from '../../services/api'
@@ -69,16 +69,20 @@ const UserManagement = () => {
     alert(`Edit user: ${user.name}\n\nEdit user modal coming soon!`);
   };
 
-const handleBanUser = async (user) => {
-    if (window.confirm(`Are you sure you want to ban ${user.name}?`)) {
+const handleToggleBan = async (user) => {
+    const isBanned = user.status === 'banned';
+    const newStatus = isBanned ? 'active' : 'banned';
+    const actionText = isBanned ? 'unban' : 'ban';
+
+    if (window.confirm(`Are you sure you want to ${actionText} ${user.name}?`)) {
       try {
-        await api.patch(`/admin/users/${user.id}/`, { status: 'banned' });
+        await api.patch(`/admin/users/${user.id}/`, { status: newStatus });
         
-        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, status: 'banned' } : u));
-        alert(`User ${user.name} banned successfully.`);
+        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, status: newStatus } : u));
+        alert(`User ${user.name} successfully ${isBanned ? 'unbanned' : 'banned'}.`);
       } catch (error) {
-        console.error("Failed to ban user:", error);
-        alert("Failed to ban user. Check backend configuration.");
+        console.error(`Failed to ${actionText} user:`, error);
+        alert(`Failed to ${actionText} user. Check backend configuration.`);
       }
     }
   };
@@ -111,7 +115,6 @@ const handleBanUser = async (user) => {
     const classes = {
       active: 'status-active',
       banned: 'status-banned',
-      suspended: 'status-suspended'
     };
     return classes[status] || 'status-active';
   };
@@ -181,7 +184,6 @@ const handleBanUser = async (user) => {
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="banned">Banned</option>
-              <option value="suspended">Suspended</option>
             </select>
             <ChevronDown size={18} className="dropdown-icon" />
           </div>
@@ -262,11 +264,12 @@ const handleBanUser = async (user) => {
                                 <span>Edit User</span>
                               </button>
                               <button 
-                                onClick={() => handleBanUser(user)}
-                                className="action-item action-warning"
+                                onClick={() => handleToggleBan(user)}
+                                className={`action-item ${user.status === 'banned' ? 'action-success' : 'action-warning'}`}
+                                style={user.status === 'banned' ? { color: '#22c55e' } : {}}
                               >
-                                <Ban size={16} />
-                                <span>Ban User</span>
+                                {user.status === 'banned' ? <CheckCircle size={16} /> : <Ban size={16} />}
+                                <span>{user.status === 'banned' ? 'Unban User' : 'Ban User'}</span>
                               </button>
                               <button 
                                 onClick={() => handleDeleteUser(user)}
