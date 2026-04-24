@@ -20,6 +20,19 @@ import ParkingMap from '../../components/driver/Map';
 import ParkingLotCard from '../../components/driver/ParkingLotCard';
 import './FindParking.css';
 
+//calculates distance in km
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return '-';
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return (R * c).toFixed(1);
+};
+
 const FindParking = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -108,18 +121,23 @@ const FindParking = () => {
           const lat = !isNaN(parsedLat) ? parsedLat : -1.2921;
           const lng = !isNaN(parsedLng) ? parsedLng : 36.8219;
 
+          let realDistance = '-';
+          if (userLocation?.lat && userLocation?.lng) {
+            realDistance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+          }
+
           return {
             id: lot.id,
             name: lot.name,
             location: lot.location,
             category: 'all', 
             coordinates: { lat, lng },
-            distance: (Math.random() * 5).toFixed(1), 
-            available: lot.total_capacity, 
+            distance: realDistance, 
+            available: lot.available_slots !== undefined ? lot.available_slots : lot.total_capacity,
             total: lot.total_capacity,
             hourlyRate: parseFloat(lot.hourly_rate),
-            rating: 4.5, 
-            reviewCount: 12,
+            rating: lot.average_rating || 4.5, 
+            reviewCount: lot.review_count || 0,
             amenities: parsedAmenities,
             hours: lot.is_24_7 ? 'Open 24/7' : `${lot.open_time} - ${lot.close_time}`,
             image: null,
@@ -210,7 +228,9 @@ const FindParking = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'distance':
-          return a.distance - b.distance;
+          const distA = a.distance === '-' ? Infinity : parseFloat(a.distance);
+          const distB = b.distance === '-' ? Infinity : parseFloat(b.distance);
+          return distA - distB;
         case 'price':
           return a.hourlyRate - b.hourlyRate;
         case 'availability':

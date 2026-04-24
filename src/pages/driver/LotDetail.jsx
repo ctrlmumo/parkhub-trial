@@ -1,13 +1,3 @@
-/**
- * ParkHub - Lot Detail Page
- * 
- * Displays detailed information about a specific parking lot with:
- * - Lot header (name, location, rating)
- * - Lot info card (hours, amenities, pricing)
- * - Enhanced satellite-view parking grid
- * - Booking modal integration
- */
-
 import api from '../../services/api'
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
