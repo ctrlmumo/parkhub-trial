@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, MoreVertical, Eye, XCircle, DollarSign, Calendar } from 'lucide-react';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import './BookingManagement.css';
+import api from '../../services/api'
 
 const BookingManagement = () => {
   const [bookings, setBookings] = useState([]);
@@ -17,21 +18,32 @@ const BookingManagement = () => {
     loadBookings();
   }, []);
 
-  /**
-   * Load all bookings
-   * TODO: Replace with API call
-   */
-  const loadBookings = () => {
-    setTimeout(() => {
-      // TODO: Replace with real API call
-      // const response = await api.get('/admin/bookings');
-      // setBookings(response.data);
+  /* Load all bookings */
+  const loadBookings = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/bookings/');
       
-      // Empty state - no mock data
-      setBookings([]);
-      setFilteredBookings([]);
+      // Map the backend structure to the table's expected format
+      const formattedBookings = response.data.map(booking => ({
+        id: booking.id,
+        user: `User #${booking.user}`, // Using ID since serializer returns user ID
+        lot: booking.slot_details?.lot_details?.name || 'Unknown Lot',
+        slot: booking.slot_details?.slot_number || 'N/A',
+        vehicle: booking.vehicle_number,
+        duration: `${booking.duration_hours}h`,
+        amount: booking.total_amount,
+        payment: booking.status === 'active' || booking.status === 'completed' ? 'paid' : 'pending',
+        status: booking.status
+      }));
+      
+      setBookings(formattedBookings);
+      setFilteredBookings(formattedBookings);
+    } catch (error) {
+      console.error("Failed to load bookings:", error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   /* Handle search and filters */

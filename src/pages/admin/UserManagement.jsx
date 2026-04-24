@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, MoreVertical, Edit2, Ban, Trash2, Eye } from 'lucide-react';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import './UserManagement.css';
+import api from '../../services/api'
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -17,21 +18,21 @@ const UserManagement = () => {
     loadUsers();
   }, []);
 
-  /**
-   * Load all users
-   * TODO: Replace with API call
-   */
-  const loadUsers = () => {
-    setTimeout(() => {
-      // TODO: Replace with real API call
-      // const response = await api.get('/admin/users');
-      // setUsers(response.data);
+  /* Load all users */
+  
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      // Fetch users from the new Django endpoint
+      const response = await api.get('/admin/users/');
       
-      // Empty state - no mock data
-      setUsers([]);
-      setFilteredUsers([]);
+      setUsers(response.data);
+      setFilteredUsers(response.data);
+    } catch (error) {
+      console.error("Failed to load users:", error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   /* Handle search and filters */

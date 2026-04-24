@@ -229,6 +229,25 @@ class DashboardViewSet(viewsets.ViewSet):
 class AdminDashboardViewSet(viewsets.ViewSet):
     permission_classes = [IsAdminRole]
 
+    @action(detail=False, methods=['get'], url_path='users')
+    def users(self, request):
+        users = User.objects.all()
+        data = []
+        for u in users:
+            # Count how many bookings this user has made
+            bookings_count = Booking.objects.filter(user=u).count()
+            data.append({
+                'id': u.id,
+                'name': u.username, 
+                'email': u.email,
+                'phone': u.phone_number or 'N/A',
+                'role': u.role,
+                'joined': u.date_joined.strftime('%Y-%m-%d') if u.date_joined else 'N/A',
+                'bookings': bookings_count,
+                'status': u.status
+            })
+        return Response(data)
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         total_users = User.objects.count()
