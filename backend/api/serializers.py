@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.db.models import Avg  # NEW: Required to calculate average ratings safely
+from django.db.models import Avg
 from .models import ParkingLot, ParkingSlot, Booking, Payment, Review, AuditLog
 
 User = get_user_model()
@@ -60,6 +60,7 @@ class ParkingSlotSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     slot_details = ParkingSlotSerializer(source='parking_slot', read_only=True)
+    user_details = UserSerializer(source='user', read_only=True)
     class Meta:
         model = Booking
         fields = '__all__'

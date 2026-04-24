@@ -39,7 +39,7 @@ const BookingManagement = () => {
       // Map the backend structure to the table's expected format
       const formattedBookings = response.data.map(booking => ({
         id: booking.id,
-        user: `User #${booking.user}`, // Using ID since serializer returns user ID
+        user: booking.user_details ? booking.user_details.username : `User #${booking.user}`,
         lot: booking.slot_details?.lot_details?.name || 'Unknown Lot',
         slot: booking.slot_details?.slot_number || 'N/A',
         vehicle: booking.vehicle_number,
