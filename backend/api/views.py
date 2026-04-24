@@ -109,6 +109,14 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        now = timezone.now()
+
+        Booking.objects.filter(
+            status='active',
+            end_time__lte=now
+        ).update(status='completed')
+
+        # return the filtered list to the frontend based on user role
         if user.role == 'driver':
             return Booking.objects.filter(user=user)
         elif user.role == 'manager':

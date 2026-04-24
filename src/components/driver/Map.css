@@ -1,0 +1,28 @@
+/* Ensure the wrapper completely fills the FindParking right-side panel */
+.leaflet-wrapper {
+  width: 100%;
+  height: 100%;
+  position: absolute; /* Locks it to the boundaries of .map-section */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+/* Force Leaflet to respect the wrapper's dimensions */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1;
+}
+
+/* Make sure popups look nice */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+}

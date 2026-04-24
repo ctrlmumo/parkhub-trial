@@ -1,19 +1,3 @@
-/**
- * ParkHub - Find Parking Page
- * 
- * Uber-inspired split-view interface:
- * - Left: Results list (40%)
- * - Right: Google Maps (60%)
- * - Mobile: Stacked layout (map top, list bottom)
- * 
- * Features:
- * - Search by specific place or category
- * - Real-time availability updates
- * - Interactive map with markers
- * - Map ↔ List synchronization
- * - Filters and sorting
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
@@ -29,9 +13,10 @@ import {
   Zap,
   Camera
 } from 'lucide-react';
+import api from '../../services/api';
 import Navbar from '../../components/common/Navbar';
 import Button from '../../components/common/Button';
-import GoogleMap from '../../components/driver/GoogleMap';
+import ParkingMap from '../../components/driver/Map';
 import ParkingLotCard from '../../components/driver/ParkingLotCard';
 import './FindParking.css';
 
@@ -102,113 +87,54 @@ const FindParking = () => {
     { value: '24_7', label: '24/7 Access', icon: Clock },
   ];
   
-  /* MOCK DATA - TODO: Replace with API calls */
-  
+/* FETCH REAL DATA */
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockLots = [
-        {
-          id: 1,
-          name: 'Main Campus Parking Lot',
-          location: 'University Way, Nairobi',
-          category: 'university',
-          coordinates: { lat: -1.2841, lng: 36.8155 },
-          distance: 0.8, // km from user
-          available: 24,
-          total: 80,
-          hourlyRate: 50,
-          rating: 4.3,
-          reviewCount: 89,
-          amenities: ['covered', 'cctv', '24_7'],
-          hours: 'Open 24/7',
-          image: null,
-        },
-        {
-          id: 2,
-          name: 'Library Parking',
-          location: 'Library Road, Nairobi',
-          category: 'university',
-          coordinates: { lat: -1.2821, lng: 36.8175 },
-          distance: 1.2,
-          available: 15,
-          total: 50,
-          hourlyRate: 40,
-          rating: 4.5,
-          reviewCount: 124,
-          amenities: ['cctv', '24_7'],
-          hours: 'Open 24/7',
-          image: null,
-        },
-        {
-          id: 3,
-          name: 'Westgate Mall Parking',
-          location: 'Westlands, Nairobi',
-          category: 'mall',
-          coordinates: { lat: -1.2676, lng: 36.8062 },
-          distance: 2.1,
-          available: 120,
-          total: 200,
-          hourlyRate: 60,
-          rating: 4.7,
-          reviewCount: 456,
-          amenities: ['covered', 'cctv', 'ev_charging'],
-          hours: '8:00 AM - 10:00 PM',
-          image: null,
-        },
-        {
-          id: 4,
-          name: 'Downtown Business Center',
-          location: 'CBD, Nairobi',
-          category: 'office',
-          coordinates: { lat: -1.2864, lng: 36.8172 },
-          distance: 1.5,
-          available: 8,
-          total: 40,
-          hourlyRate: 80,
-          rating: 4.1,
-          reviewCount: 67,
-          amenities: ['covered', 'cctv', '24_7', 'ev_charging'],
-          hours: 'Open 24/7',
-          image: null,
-        },
-        {
-          id: 5,
-          name: 'Kenyatta Hospital Parking',
-          location: 'Hospital Road, Nairobi',
-          category: 'hospital',
-          coordinates: { lat: -1.3000, lng: 36.8073 },
-          distance: 2.8,
-          available: 45,
-          total: 150,
-          hourlyRate: 30,
-          rating: 3.9,
-          reviewCount: 203,
-          amenities: ['covered', 'cctv', '24_7'],
-          hours: 'Open 24/7',
-          image: null,
-        },
-        {
-          id: 6,
-          name: 'Sarit Centre Parking',
-          location: 'Westlands, Nairobi',
-          category: 'mall',
-          coordinates: { lat: -1.2627, lng: 36.8021 },
-          distance: 2.5,
-          available: 85,
-          total: 300,
-          hourlyRate: 50,
-          rating: 4.4,
-          reviewCount: 892,
-          amenities: ['covered', 'cctv'],
-          hours: '8:00 AM - 10:00 PM',
-          image: null,
-        },
-      ];
-      
-      setParkingLots(mockLots);
-      setLoading(false);
-    }, 1000);
+    const fetchLots = async () => {
+      try {
+        const response = await api.get('/parking-lots/');
+        
+        // Map Django data to the format the UI expects
+        const formattedLots = response.data.map(lot => {
+          let parsedAmenities = [];
+          try {
+            if (lot.amenities) parsedAmenities = JSON.parse(lot.amenities);
+          } catch(e) {}
+
+          // Safely parse numbers. If it fails, it returns NaN
+          const parsedLat = parseFloat(lot.latitude);
+          const parsedLng = parseFloat(lot.longitude);
+          
+          // Use the parsed number ONLY if it is a valid number, otherwise default to Nairobi
+          const lat = !isNaN(parsedLat) ? parsedLat : -1.2921;
+          const lng = !isNaN(parsedLng) ? parsedLng : 36.8219;
+
+          return {
+            id: lot.id,
+            name: lot.name,
+            location: lot.location,
+            category: 'all', 
+            coordinates: { lat, lng },
+            distance: (Math.random() * 5).toFixed(1), 
+            available: lot.total_capacity, 
+            total: lot.total_capacity,
+            hourlyRate: parseFloat(lot.hourly_rate),
+            rating: 4.5, 
+            reviewCount: 12,
+            amenities: parsedAmenities,
+            hours: lot.is_24_7 ? 'Open 24/7' : `${lot.open_time} - ${lot.close_time}`,
+            image: null,
+          };
+        });
+        
+        setParkingLots(formattedLots);
+      } catch (error) {
+        console.error("Failed to fetch parking lots:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLots();
     
     // Get user location
     if (navigator.geolocation) {
@@ -370,7 +296,6 @@ const FindParking = () => {
           {/* Search Bar */}
           <div className="search-header">
             <div className="search-bar-find">
-              <Search className="search-icon" size={20} />
               <input
                 type="text"
                 className="search-input-find"
@@ -580,9 +505,9 @@ const FindParking = () => {
           </div>
         </div>
         
-        {/* ===== RIGHT SIDE: GOOGLE MAP ===== */}
+        {/* ===== RIGHT SIDE: MAP ===== */}
         <div className={`map-section ${isMapCollapsed ? 'collapsed' : ''}`}>
-          <GoogleMap
+          <ParkingMap
             lots={filteredLots}
             userLocation={userLocation}
             hoveredLotId={hoveredLotId}

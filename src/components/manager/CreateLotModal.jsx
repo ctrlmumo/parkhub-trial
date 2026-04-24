@@ -21,51 +21,81 @@ const CreateLotModal = ({ onClose, onLotCreated }) => {
   const locationInputRef = useRef(null);
   const autocompleteRef = useRef(null);
 
-  /**
-   * Initialize Google Places Autocomplete
-   */
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+/* Real-time OpenStreetMap Autocomplete (Photon API) */
   useEffect(() => {
-    if (!window.google) {
-      console.warn('Google Maps not loaded. Using placeholder.');
-      return;
-    }
-
-    // Initialize autocomplete
-    const autocomplete = new window.google.maps.places.Autocomplete(
-      locationInputRef.current,
-      {
-        types: ['address'],
-        componentRestrictions: { country: 'ke' } // Kenya only
+    const fetchSuggestions = async () => {
+      // Only search if user has typed at least 3 characters and the dropdown is active
+      if (!formData.location || formData.location.length < 3 || !showSuggestions) {
+        setSuggestions([]);
+        return;
       }
-    );
 
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
+      setIsSearchingLocation(true);
       
-      if (place.geometry) {
-        setFormData(prev => ({
-          ...prev,
-          location: place.formatted_address || place.name,
-          locationDetails: {
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng(),
-            placeId: place.place_id
-          }
-        }));
-        
-        // Clear error
-        if (errors.location) {
-          setErrors(prev => ({ ...prev, location: '' }));
+      try {
+        // Query Photon API, biasing results towards Nairobi (lat=-1.29&lon=36.82)
+        const searchQuery = encodeURIComponent(formData.location);
+        const response = await fetch(`https://photon.komoot.io/api/?q=${searchQuery}&limit=5&lat=-1.2921&lon=36.8219`);
+        const data = await response.json();
+
+        if (data && data.features) {
+          const formattedSuggestions = data.features.map(f => {
+            const props = f.properties;
+            // Build a readable address string (e.g., "Westgate Mall, Westlands, Nairobi")
+            const addressParts = [props.name, props.street, props.city || props.town].filter(Boolean);
+            
+            return {
+              id: props.osm_id,
+              displayName: addressParts.join(', '),
+              lat: f.geometry.coordinates[1], // GeoJSON returns [lng, lat]
+              lng: f.geometry.coordinates[0],
+              type: props.osm_value
+            };
+          }).filter(s => s.displayName); // Remove empty results
+
+          // Remove duplicates based on the display name
+          const uniqueSuggestions = Array.from(new Map(formattedSuggestions.map(item => [item.displayName, item])).values());
+          
+          setSuggestions(uniqueSuggestions);
         }
+      } catch (error) {
+        console.error("Autocomplete failed:", error);
+      } finally {
+        setIsSearchingLocation(false);
       }
-    });
+    };
 
-    autocompleteRef.current = autocomplete;
-  }, []);
+    // Debounce: Wait 400ms after the user stops typing before making the API call
+    const delayDebounceFn = setTimeout(() => {
+      fetchSuggestions();
+    }, 400);
 
-  /**
-   * Handle input change
-   */
+    return () => clearTimeout(delayDebounceFn);
+  }, [formData.location, showSuggestions]);
+
+  // Handle clicking a dropdown suggestion
+  const handleSuggestionSelect = (suggestion) => {
+    setFormData(prev => ({
+      ...prev,
+      location: suggestion.displayName,
+      locationDetails: {
+        lat: suggestion.lat,
+        lng: suggestion.lng
+      }
+    }));
+    setShowSuggestions(false); // Hide the dropdown
+    setSuggestions([]); // Clear suggestions
+    
+    if (errors.location) {
+      setErrors(prev => ({ ...prev, location: '' }));
+    }
+  };
+
+  /* Handle input change */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
@@ -253,22 +283,57 @@ const CreateLotModal = ({ onClose, onLotCreated }) => {
             {errors.name && <p className="error-message">{errors.name}</p>}
           </div>
 
-          {/* Location (Google Maps Autocomplete) */}
-          <div className="form-group">
+      {/* Location (Real-time OSM Autocomplete) */}
+          <div className="form-group" style={{ position: 'relative' }}>
             <label className="form-label">
               <MapPin size={16} />
-              Location <span className="required">*</span>
+              Location Address <span className="required">*</span>
             </label>
-            <input
-              ref={locationInputRef}
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleLocationChange}
-              placeholder="Search for address..."
-              className={`form-input ${errors.location ? 'error' : ''}`}
-            />
-            <p className="form-hint">Start typing to search with Google Maps</p>
+            <div className="autocomplete-wrapper">
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={(e) => {
+                  handleLocationChange(e);
+                  setShowSuggestions(true); // Open dropdown when typing
+                  // Wipe old coordinates if they start typing a new location
+                  setFormData(prev => ({ ...prev, locationDetails: null })); 
+                }}
+                placeholder="e.g., Westgate Mall, Westlands"
+                className={`form-input ${errors.location ? 'error' : ''}`}
+                autoComplete="off"
+              />
+              
+              {/* The "Uber-like" Dropdown */}
+              {showSuggestions && (formData.location.length >= 3) && (
+                <ul className="suggestions-dropdown">
+                  {isSearchingLocation ? (
+                    <li className="suggestion-item loading">Searching...</li>
+                  ) : suggestions.length > 0 ? (
+                    suggestions.map((suggestion, index) => (
+                      <li 
+                        key={`${suggestion.id}-${index}`} 
+                        className="suggestion-item"
+                        onClick={() => handleSuggestionSelect(suggestion)}
+                      >
+                        <MapPin size={14} className="suggestion-icon" />
+                        <span>{suggestion.displayName}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="suggestion-item empty">No results found</li>
+                  )}
+                </ul>
+              )}
+            </div>
+            
+            {/* Show a green checkmark if valid coordinates are locked in */}
+            {formData.locationDetails && !showSuggestions && (
+              <p className="form-hint" style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                ✓ Coordinates locked
+              </p>
+            )}
             {errors.location && <p className="error-message">{errors.location}</p>}
           </div>
 

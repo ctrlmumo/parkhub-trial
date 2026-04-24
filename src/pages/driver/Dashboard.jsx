@@ -88,6 +88,23 @@ const DriverDashboard = () => {
   }, [user]);
 {
 
+  /* Auto-expiry timer to check every 60 seconds and remove expired bookings from the UI */
+  useEffect(() => {
+    const expiryCheckInterval = setInterval(() => {
+      const now = new Date();
+
+      setActiveBookings(prevBookings => {
+        return prevBookings.filter(booking => {
+          // booking.expiryTime is already a Date object from our fetch mapping
+          return booking.expiryTime > now; 
+        });
+      });
+    }, 60000); // Runs every minute
+
+    // Cleanup the timer when the component unmounts
+    return () => clearInterval(expiryCheckInterval);
+  }, []);
+
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
     setIsBookingModalOpen(true);
@@ -133,8 +150,13 @@ const DriverDashboard = () => {
 
   /* Open Google Maps navigation */
   const handleNavigate = (location) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`;
-    window.open(url, '_blank');
+    if (location && location.lat && location.lng) {
+      // Use the official Google Maps Directions URL
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`;
+      window.open(url, '_blank');
+    } else {
+      alert('Coordinates are missing for this parking lot.');
+    }
   };
 
   return (

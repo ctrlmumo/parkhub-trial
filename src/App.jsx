@@ -3,7 +3,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import GoogleMap from './components/driver/GoogleMap';
+import Map from './components/driver/Map';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import DriverDashboard from './pages/driver/Dashboard';

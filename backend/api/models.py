@@ -50,6 +50,8 @@ class ParkingLot(models.Model):
     class Meta:
         db_table = 'parking_lots'
 
+    def __str__(self):
+        return self.name
 class ParkingSlot(models.Model):
     STATUS_CHOICES = (
         ('available', 'Available'),
@@ -73,6 +75,8 @@ class ParkingSlot(models.Model):
         db_table = 'parking_slots'
         unique_together = ('parking_lot', 'slot_number')
 
+    def __str__(self):
+        return f"{self.parking_lot.name} - Slot {self.slot_number}"
 class Booking(models.Model):
     STATUS_CHOICES = (
         ('active', 'Active'),
@@ -100,6 +104,8 @@ class Booking(models.Model):
     class Meta:
         db_table = 'bookings'
 
+    def __str__(self):
+        return f"Booking #{self.id} - {self.vehicle_number}"
 class Payment(models.Model):
     METHOD_CHOICES = (
         ('mpesa', 'M-Pesa'),
@@ -125,6 +131,9 @@ class Payment(models.Model):
 
     class Meta:
         db_table = 'payments'
+
+    def __str__(self):
+        return f"Payment #{self.id} for Booking #{self.booking_id}"
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
