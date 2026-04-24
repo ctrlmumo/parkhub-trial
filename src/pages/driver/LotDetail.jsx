@@ -228,6 +228,7 @@ const LotDetail = () => {
         isOpen={showBookingModal}
         onClose={handleCloseModal}
         onComplete={handleBookingComplete}
+        hourlyRate={lot.pricing.hourly}
       />
     </div>
   );

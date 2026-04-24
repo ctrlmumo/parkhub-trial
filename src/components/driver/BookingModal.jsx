@@ -1,9 +1,3 @@
-/**
- * ParkHub - BookingModal Component
- * 
- * Multi-step booking flow: Vehicle Details → Duration → Payment → Success
- */
-
 import { useState } from 'react';
 import { X, Car, Clock, CreditCard, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
@@ -15,7 +9,7 @@ import { DURATION_OPTIONS, HOURLY_RATE } from '../../utils/constants';
 import { formatPrice } from '../../utils/helpers';
 import './BookingModal.css';
 
-const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
+const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
   const { user } = useAuth(); // gets the logged-in user
   
   // Multi-step state
@@ -36,25 +30,20 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
   // Validation errors
   const [errors, setErrors] = useState({});
 
-  /**
-   * Calculate total cost
-   */
+  /* Calculate total cost */
   const calculateCost = () => {
-    return formData.duration * HOURLY_RATE;
+    const rateToUse = hourlyRate || 50;
+    return formData.duration * rateToUse;
   };
 
-  /**
-   * Calculate end time
-   */
+  /* Calculate end time */
   const calculateEndTime = () => {
     const endTime = new Date(formData.startTime);
     endTime.setHours(endTime.getHours() + formData.duration);
     return endTime;
   };
 
-  /**
-   * Handle input change
-   */
+  /* Handle input change */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -64,9 +53,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
     }
   };
 
-  /**
-   * Validate step 1 (vehicle details)
-   */
+  /* Validate vehicle details */
   const validateStep1 = () => {
     const newErrors = {};
     
@@ -84,9 +71,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handle next step
-   */
+  /* Handle next step */
   const handleNext = () => {
     if (step === 1) {
       if (validateStep1()) {
@@ -97,18 +82,14 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
     }
   };
 
-  /**
-   * Handle back step
-   */
+  /* Handle back step */
   const handleBack = () => {
     if (step > 1 && step < 4) {
       setStep(step - 1);
     }
   };
 
-  /**
-   * Simulate M-Pesa payment
-   */
+  /* Simulate M-Pesa payment */
   const handlePayment = async () => {
     setPaymentLoading(true);
     
@@ -118,12 +99,12 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
       // 1. Create the booking in the database
       const payload = {
         user: user.id,
-        parking_slot: slot.id, // Uses the real database ID we fixed in ParkingGrid
+        parking_slot: slot.id,
         start_time: formData.startTime.toISOString(),
         end_time: calculateEndTime().toISOString(),
         duration_hours: formData.duration,
         vehicle_number: formData.vehicleNumber,
-        hourly_rate: HOURLY_RATE,
+        hourly_rate: hourlyRate,
         total_amount: calculateCost(),
         booking_reference: ref,
         status: 'active'
@@ -146,9 +127,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
     }
   };
 
-  /**
-   * Handle booking completion
-   */
+  /* Handle booking completion */
   const handleComplete = () => {
     const booking = {
       id: bookingReference,
@@ -273,7 +252,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete }) => {
                   >
                     <span className="duration-hours">{option.label}</span>
                     <span className="duration-price">
-                      {formatPrice(option.value * HOURLY_RATE)}
+                      {formatPrice(option.value * (hourlyRate || 50))}
                     </span>
                   </button>
                 ))}
