@@ -20,54 +20,39 @@ const SlotManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /* Load manager's parking lots on mount */
   useEffect(() => {
     if (user) {
       loadParkingLots();
     }
   }, [user]);
 
-  /* Load parking lots
-   * TODO: Replace with API call */
   const loadParkingLots = async () => {
     setLoading(true);
     try {
-      // Fetch lots managed by the current user
       const response = await api.get(`/parking-lots/?manager=${user.id}`);
       const lots = response.data;
       setParkingLots(lots);
-      
-      if (lots.length > 0 && !selectedLot) {
-        // Select first lot by default if none selected
-        // Don't auto-select if we just created one (handled by handleLotCreated)
-        // But here we might want to just let the user select
-      }
     } catch (error) {
-      console.error("Failed to load parking lots", error);
+      console.error('Failed to load parking lots', error);
     } finally {
       setLoading(false);
     }
   };
 
-  /* Load slots for selected lot */
   const loadSlots = async (lotId) => {
     try {
       const response = await api.get(`/parking-slots/?parking_lot=${lotId}`);
-      // Map API response to UI model if needed, or use directly
-      // API returns: { id, slot_number, section, status, ... }
-      // UI expects: { id, slotNumber, section, status, vehicle }
       const mappedSlots = response.data.map(s => ({
         ...s,
-        slotNumber: s.slot_number
+        slotNumber: s.slot_number,
       }));
       setSlots(mappedSlots);
       setFilteredSlots(mappedSlots);
     } catch (error) {
-      console.error("Failed to load slots", error);
+      console.error('Failed to load slots', error);
     }
   };
 
-  /* Handle lot selection */
   const handleLotSelect = (lot) => {
     setSelectedLot(lot);
     loadSlots(lot.id);
@@ -75,100 +60,115 @@ const SlotManagement = () => {
     setStatusFilter('all');
   };
 
-  /* Handle manage slots button */
   const handleManageSlots = (lot) => {
     setSelectedLot(lot);
     loadSlots(lot.id);
   };
 
-  /* Handle edit lot */
   const handleEditLot = (lot) => {
-    // TODO: Open edit modal
     alert(`Edit lot: ${lot.name}\n\nEdit modal coming soon!`);
   };
 
-  /* Handle delete lot */
   const handleDeleteLot = async (lot) => {
-    if (window.confirm(`Are you sure you want to delete "${lot.name}"?\n\nThis will delete all ${lot.total_capacity} slots and cannot be undone.`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete "${lot.name}"?\n\nThis will delete all ${lot.total_capacity} slots and cannot be undone.`
+      )
+    ) {
       try {
         await api.delete(`/parking-lots/${lot.id}/`);
-        
-        // Remove lot from state
         setParkingLots(prev => prev.filter(l => l.id !== lot.id));
-        
         if (selectedLot?.id === lot.id) {
           setSelectedLot(null);
           setSlots([]);
         }
       } catch (error) {
-        console.error("Failed to delete lot", error);
-        alert("Failed to delete parking lot.");
+        console.error('Failed to delete lot', error);
+        alert('Failed to delete parking lot.');
       }
     }
   };
 
-  /* Handle search */
+  /* Filter slots by search + status */
   useEffect(() => {
     let filtered = [...slots];
-    
-    // Search filter
     if (searchQuery) {
       filtered = filtered.filter(slot =>
         slot.slotNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (slot.vehicle && slot.vehicle.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
-    
-    // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(slot => slot.status === statusFilter);
     }
-    
     setFilteredSlots(filtered);
   }, [searchQuery, statusFilter, slots]);
 
-  /* Handle status change */
+  /*Scroll to the top when a lot is selected */
+  useEffect(() => {
+    if (selectedLot) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [selectedLot]);
+
+  /* Update a single slot's status via API and local state */
   const handleStatusChange = async (slotId, newStatus) => {
     try {
       await api.patch(`/parking-slots/${slotId}/`, { status: newStatus });
-      
-      setSlots(prevSlots =>
-        prevSlots.map(slot =>
-          slot.id === slotId ? { ...slot, status: newStatus } : slot
-        )
+      setSlots(prev =>
+        prev.map(slot => (slot.id === slotId ? { ...slot, status: newStatus } : slot))
       );
     } catch (error) {
-      console.error("Failed to update slot status", error);
+      console.error('Failed to update slot status', error);
     }
   };
 
-  /* Handle lot created */
-  const handleLotCreated = (newLot) => {
+  const handleLotCreated = newLot => {
     setParkingLots(prev => [...prev, newLot]);
     setSelectedLot(newLot);
     loadSlots(newLot.id);
     setShowCreateModal(false);
   };
 
-  /* Get status badge class */
-  const getStatusClass = (status) => {
-    const classes = {
-      available: 'status-available',
-      occupied: 'status-occupied',
-      maintenance: 'status-maintenance'
+  /* Helpers */
+  const getStatusClass = status => {
+    const map = {
+      available: 'available',
+      occupied: 'occupied',
+      maintenance: 'maintenance',
+      reserved: 'reserved',
     };
-    return classes[status] || 'status-available';
+    return map[status] || 'available';
   };
 
-  /* Get status label */
-  const getStatusLabel = (status) => {
-    const labels = {
+  const getStatusLabel = status => {
+    const map = {
       available: 'Available',
       occupied: 'Occupied',
-      maintenance: 'Maintenance'
+      maintenance: 'Maintenance',
+      reserved: 'Reserved',
     };
-    return labels[status] || status;
+    return map[status] || status;
   };
+
+  /* Group slots by section for display */
+  const groupBySection = slots => {
+    return slots.reduce((acc, slot) => {
+      const section = slot.section || 'General';
+      if (!acc[section]) acc[section] = [];
+      acc[section].push(slot);
+      return acc;
+    }, {});
+  };
+
+  /* Count per status for summary */
+  const slotCounts = slots.reduce(
+    (acc, s) => {
+      acc[s.status] = (acc[s.status] || 0) + 1;
+      return acc;
+    },
+    {}
+  );
 
   if (loading) {
     return (
@@ -182,12 +182,11 @@ const SlotManagement = () => {
     );
   }
 
-  // Empty state - no parking lots
+  /* Empty — no parking lots */
   if (parkingLots.length === 0) {
     return (
       <div className="slot-management-page">
         <ManagerNavbar />
-        
         <div className="slot-management-container">
           <div className="page-header">
             <div>
@@ -196,27 +195,28 @@ const SlotManagement = () => {
             </div>
           </div>
 
-          {/* Empty State */}
           <div className="empty-state">
             <div className="empty-state-icon">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="7" cy="17" r="2" stroke="currentColor" strokeWidth="2"/>
-                <circle cx="17" cy="17" r="2" stroke="currentColor" strokeWidth="2"/>
+                <path
+                  d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="7" cy="17" r="2" stroke="currentColor" strokeWidth="2" />
+                <circle cx="17" cy="17" r="2" stroke="currentColor" strokeWidth="2" />
               </svg>
             </div>
             <h2 className="empty-state-title">No Parking Lots Yet</h2>
-            <button 
-              onClick={() => setShowCreateModal(true)}
-              className="btn-create-lot"
-            >
+            <button onClick={() => setShowCreateModal(true)} className="btn-create-lot">
               <Plus size={20} />
               Create Parking Lot
             </button>
           </div>
         </div>
 
-        {/* Create Lot Modal */}
         {showCreateModal && (
           <CreateLotModal
             onClose={() => setShowCreateModal(false)}
@@ -227,10 +227,12 @@ const SlotManagement = () => {
     );
   }
 
+  const groupedSlots = groupBySection(filteredSlots);
+
   return (
     <div className="slot-management-page">
       <ManagerNavbar />
-      
+
       <div className="slot-management-container">
         {/* Page Header */}
         <div className="page-header">
@@ -238,53 +240,48 @@ const SlotManagement = () => {
             <h1 className="page-title">Slot Management</h1>
             <p className="page-subtitle">Manage and override parking slot statuses</p>
           </div>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="btn-create-lot-small"
-          >
+          <button onClick={() => setShowCreateModal(true)} className="btn-create-lot-small">
             <Plus size={18} />
             New Lot
           </button>
         </div>
 
         {/* Parking Lots Grid */}
-        <div className="parking-lots-grid">
-          {parkingLots.map(lot => (
-            <ParkingLotCard
-              key={lot.id}
-              lot={lot}
-              onManageSlots={handleManageSlots}
-              onEdit={handleEditLot}
-              onDelete={handleDeleteLot}
-            />
-          ))}
-        </div>
+        {/* Parking Lots Grid - Hides when a lot is selected */}
+        {!selectedLot && (
+          <div className="parking-lots-grid">
+            {parkingLots.map(lot => (
+              <ParkingLotCard
+                key={lot.id}
+                lot={lot}
+                onManageSlots={handleManageSlots}
+                onEdit={handleEditLot}
+                onDelete={handleDeleteLot}
+              />
+            ))}
+          </div>
+        )}
 
-        {/* Show slot management only when a lot is selected */}
+        {/* Slot management panel — shown when a lot is selected */}
         {selectedLot && (
           <>
             {/* Selected Lot Header */}
             <div className="selected-lot-header">
-              <h2 className="selected-lot-title">
-                Managing: {selectedLot.name}
-              </h2>
-              <button 
-                onClick={() => setSelectedLot(null)}
-                className="btn-back-to-lots"
-              >
+              <h2 className="selected-lot-title">Managing: {selectedLot.name}</h2>
+              <button onClick={() => setSelectedLot(null)} className="btn-back-to-lots">
                 ← Back to Lots
               </button>
             </div>
 
-            {/* Search and Filter */}
+            {/* Search + Filter */}
             <div className="filters-card">
               <div className="search-box">
-                <Search size={20} className="search-icon" />
+                <Search size={18} className="search-icon" />
                 <input
                   type="text"
                   placeholder="Search by slot number or vehicle..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="search-input"
                 />
               </div>
@@ -292,88 +289,91 @@ const SlotManagement = () => {
               <div className="filter-dropdown">
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  onChange={e => setStatusFilter(e.target.value)}
                   className="status-filter"
                 >
                   <option value="all">All Statuses</option>
                   <option value="available">Available</option>
                   <option value="occupied">Occupied</option>
                   <option value="maintenance">Maintenance</option>
+                  <option value="reserved">Reserved</option>
                 </select>
-                <ChevronDown size={18} className="dropdown-icon" />
+                <ChevronDown size={16} className="dropdown-icon" />
               </div>
             </div>
 
-            {/* Slots Table */}
+            {/* Slots Grid Card */}
             <div className="slots-table-card">
               <div className="table-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect x="3" y="3" width="7" height="7" rx="1"/>
-                  <rect x="14" y="3" width="7" height="7" rx="1"/>
-                  <rect x="14" y="14" width="7" height="7" rx="1"/>
-                  <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
                 <h3 className="table-title">
-                  All Parking Slots ({filteredSlots.length})
+                  All Slots ({filteredSlots.length})
+                  {Object.entries(slotCounts).map(([s, count]) => (
+                    <span
+                      key={s}
+                      style={{ marginLeft: '0.5rem', fontSize: 'var(--text-xs)', fontWeight: 600 }}
+                      className={`slot-status-badge ${getStatusClass(s)}`}
+                    >
+                      {count} {getStatusLabel(s)}
+                    </span>
+                  ))}
                 </h3>
               </div>
 
-              <div className="table-container">
-                <table className="slots-table">
-                  <thead>
-                    <tr>
-                      <th>Slot</th>
-                      <th>Section</th>
-                      <th>Status</th>
-                      <th>Vehicle</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredSlots.map(slot => (
-                      <tr key={slot.id}>
-                        <td>
-                          <span className="slot-number">{slot.slotNumber}</span>
-                        </td>
-                        <td>
-                          <span className="slot-section">{slot.section}</span>
-                        </td>
-                        <td>
-                          <span className={`status-badge ${getStatusClass(slot.status)}`}>
-                            <span className="status-dot"></span>
+              {filteredSlots.length === 0 ? (
+                <div className="table-empty">No slots found.</div>
+              ) : (
+                <div className="slots-grid-container">
+                  {Object.entries(groupedSlots).map(([section, sectionSlots]) => (
+                    <>
+                      {Object.keys(groupedSlots).length > 1 && (
+                        <div key={`label-${section}`} className="slot-section-label">
+                          Section {section}
+                        </div>
+                      )}
+                      {sectionSlots.map(slot => (
+                        <div key={slot.id} className="slot-card">
+                          {/* Top row: slot number + status dot */}
+                          <div className="slot-card-header">
+                            <span className="slot-number-badge">{slot.slotNumber}</span>
+                            <span className={`slot-status-dot ${getStatusClass(slot.status)}`} />
+                          </div>
+
+                          {/* Status badge */}
+                          <span className={`slot-status-badge ${getStatusClass(slot.status)}`}>
                             {getStatusLabel(slot.status)}
                           </span>
-                        </td>
-                        <td>
-                          <span className="vehicle-number">
-                            {slot.vehicle || '—'}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="actions-dropdown">
-                            <select
-                              value={slot.status}
-                              onChange={(e) => handleStatusChange(slot.id, e.target.value)}
-                              className="action-select"
-                            >
-                              <option value="available">Available</option>
-                              <option value="occupied">Occupied</option>
-                              <option value="maintenance">Maintenance</option>
-                            </select>
-                            <ChevronDown size={16} className="action-dropdown-icon" />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
 
-                {filteredSlots.length === 0 && (
-                  <div className="table-empty">
-                    <p>No slots found.</p>
-                  </div>
-                )}
-              </div>
+                          {/* Vehicle (if any) */}
+                          {slot.vehicle && (
+                            <div className="slot-vehicle" title={slot.vehicle}>
+                              {slot.vehicle}
+                            </div>
+                          )}
+
+                          {/* Action dropdown — per slot */}
+                          <select
+                            value={slot.status}
+                            onChange={e => handleStatusChange(slot.id, e.target.value)}
+                            className="slot-action-select"
+                            title="Change slot status"
+                          >
+                            <option value="available">→ Available</option>
+                            <option value="occupied">→ Occupied</option>
+                            <option value="maintenance">→ Maintenance</option>
+                            <option value="reserved">→ Reserved</option>
+                          </select>
+                        </div>
+                      ))}
+                    </>
+                  ))}
+                </div>
+              )}
             </div>
           </>
         )}

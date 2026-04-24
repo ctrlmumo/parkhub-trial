@@ -54,81 +54,55 @@
 
 .btn-create-lot-small:hover {
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-/* Lot Selector Card */
-.lot-selector-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) * 1.5);
-  padding: var(--spacing-lg);
-}
-
-.lot-selector-label {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--foreground);
-  margin-bottom: var(--spacing-md);
-}
-
-.lot-selector-buttons {
+/* Parking Lots Grid */
+.parking-lots-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
-.lot-button {
+/* Selected Lot Header */
+.selected-lot-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md);
-  background: var(--background);
-  border: 2px solid var(--border);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
+  gap: var(--spacing-md);
+}
+
+.selected-lot-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.btn-back-to-lots {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0.5rem var(--spacing-md);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
-  text-align: left;
+  white-space: nowrap;
 }
 
-.lot-button:hover {
-  border-color: var(--primary);
+.btn-back-to-lots:hover {
   background: var(--muted);
-}
-
-.lot-button.active {
-  border-color: var(--primary);
-  background: hsl(var(--primary-h) var(--primary-s) 95%);
-}
-
-.dark .lot-button.active {
-  background: hsl(var(--primary-h) var(--primary-s) 15%);
-}
-
-.lot-button-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.lot-name {
-  font-size: var(--text-base);
-  font-weight: 600;
   color: var(--foreground);
-}
-
-.lot-location {
-  font-size: var(--text-sm);
-  color: var(--muted-foreground);
-}
-
-.lot-slots {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--muted-foreground);
-  padding: 0.25rem 0.75rem;
-  background: var(--muted);
-  border-radius: 9999px;
+  border-color: var(--primary);
 }
 
 /* Filters Card */
@@ -136,7 +110,7 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) * 1.5);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
   display: flex;
   gap: var(--spacing-md);
   align-items: center;
@@ -159,29 +133,30 @@
 .search-input {
   width: 100%;
   padding: 0.625rem var(--spacing-md) 0.625rem 2.75rem;
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   color: var(--foreground);
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: all var(--transition-fast);
+  font-family: inherit;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px hsl(var(--primary-h) var(--primary-s) var(--primary-l) / 0.1);
+  box-shadow: 0 0 0 3px hsla(211, 65%, 55%, 0.1);
 }
 
 .filter-dropdown {
   position: relative;
-  min-width: 200px;
+  min-width: 180px;
 }
 
 .status-filter {
   width: 100%;
   padding: 0.625rem 2.5rem 0.625rem var(--spacing-md);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   color: var(--foreground);
   background: var(--background);
   border: 1px solid var(--border);
@@ -189,6 +164,7 @@
   cursor: pointer;
   appearance: none;
   transition: all var(--transition-fast);
+  font-family: inherit;
 }
 
 .status-filter:focus {
@@ -205,7 +181,10 @@
   pointer-events: none;
 }
 
-/* Slots Table Card */
+/* =============================================
+   SLOTS LIST (Vertical Layout)
+   ============================================= */
+
 .slots-table-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -217,7 +196,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--border);
   color: var(--foreground);
 }
@@ -228,178 +207,168 @@
   margin: 0;
 }
 
-.table-container {
-  overflow-x: auto;
+/* Slot List Container */
+.slots-grid-container {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Tighter gap for a vertical list */
 }
 
-.slots-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Individual Slot Row */
+.slot-card {
+  position: relative;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem var(--spacing-lg);
+  display: grid;
+  /* 3 evenly spaced columns, plus a reduced 120px column for the dropdown */
+  grid-template-columns: 1fr 1fr 1fr 120px; 
+  align-items: center;
+  gap: var(--spacing-md);
+  transition: all var(--transition-fast);
 }
 
-.slots-table thead {
+.slot-card:hover {
+  border-color: var(--primary);
   background: var(--muted);
+  transform: translateX(4px);
+  box-shadow: none;
 }
 
-.slots-table th {
-  text-align: left;
-  padding: var(--spacing-md) var(--spacing-lg);
+/* Slot Card Header Row (Aligns to the left edge) */
+.slot-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  justify-self: start;
+}
+
+/* Add this to center the badge in its column */
+.slot-status-badge {
+  /* ... keep your existing padding/colors ... */
+  justify-self: center;
+}
+
+/* Update vehicle to center its text */
+.slot-vehicle {
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  justify-self: center;
+  text-align: center;
 }
 
-.slots-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background var(--transition-fast);
-}
-
-.slots-table tbody tr:hover {
-  background: var(--muted);
-}
-
-.slots-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.slots-table td {
-  padding: var(--spacing-md) var(--spacing-lg);
-}
-
-/* Slot Number */
-.slot-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.375rem 0.75rem;
-  background: hsl(217, 91%, 95%);
-  color: hsl(217, 91%, 45%);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  border-radius: var(--radius);
-}
-
-.dark .slot-number {
+.dark .slot-number-badge {
   background: hsl(217, 91%, 20%);
   color: hsl(217, 91%, 70%);
 }
 
-.slot-section {
-  font-size: var(--text-base);
-  color: var(--foreground);
+/* Status indicator dot */
+.slot-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-/* Status Badge */
-.status-badge {
+.slot-status-dot.available { background: hsl(142, 70%, 45%); }
+.slot-status-dot.occupied  { background: hsl(0, 70%, 50%); }
+.slot-status-dot.maintenance { background: hsl(38, 95%, 50%); }
+.slot-status-dot.reserved  { background: hsl(217, 91%, 55%); }
+
+/* Status badge */
+.slot-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.875rem;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.slot-status-badge.available { background: hsl(142, 70%, 95%); color: hsl(142, 70%, 35%); }
+.slot-status-badge.occupied { background: hsl(0, 65%, 95%); color: hsl(0, 70%, 40%); }
+.slot-status-badge.maintenance { background: hsl(38, 90%, 95%); color: hsl(38, 95%, 35%); }
+.slot-status-badge.reserved { background: hsl(217, 91%, 95%); color: hsl(217, 91%, 45%); }
+
+.dark .slot-status-badge.available { background: hsl(142, 40%, 15%); color: hsl(142, 60%, 70%); }
+.dark .slot-status-badge.occupied { background: hsl(0, 40%, 15%); color: hsl(0, 60%, 70%); }
+.dark .slot-status-badge.maintenance { background: hsl(38, 50%, 15%); color: hsl(38, 70%, 70%); }
+.dark .slot-status-badge.reserved { background: hsl(217, 91%, 20%); color: hsl(217, 91%, 70%); }
+
+/* Vehicle plate display */
+.slot-vehicle {
   font-size: var(--text-sm);
   font-weight: 600;
-  border-radius: 9999px;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.status-available {
-  background: hsl(142, 70%, 95%);
-  color: hsl(142, 70%, 35%);
-}
-
-.status-available .status-dot {
-  background: hsl(142, 70%, 45%);
-}
-
-.status-occupied {
-  background: hsl(0, 65%, 95%);
-  color: hsl(0, 70%, 40%);
-}
-
-.status-occupied .status-dot {
-  background: hsl(0, 70%, 50%);
-}
-
-.status-maintenance {
-  background: hsl(38, 90%, 95%);
-  color: hsl(38, 95%, 35%);
-}
-
-.status-maintenance .status-dot {
-  background: hsl(38, 95%, 50%);
-}
-
-.dark .status-available {
-  background: hsl(142, 40%, 15%);
-  color: hsl(142, 60%, 70%);
-}
-
-.dark .status-occupied {
-  background: hsl(0, 40%, 15%);
-  color: hsl(0, 60%, 70%);
-}
-
-.dark .status-maintenance {
-  background: hsl(38, 50%, 15%);
-  color: hsl(38, 70%, 70%);
-}
-
-.vehicle-number {
-  font-size: var(--text-base);
   color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Actions Dropdown */
-.actions-dropdown {
-  position: relative;
-  display: inline-block;
-  min-width: 140px;
-}
-
-.action-select {
-  width: 100%;
-  padding: 0.375rem 2rem 0.375rem 0.75rem;
-  font-size: var(--text-sm);
+/* Action select dropdown */
+.slot-action-select {
+  width: 120px;
+  padding: 6px 2px 6px 8px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--foreground);
   background: var(--background);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) * 0.5);
   cursor: pointer;
   appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
   transition: all var(--transition-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236B7280' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
 }
 
-.action-select:hover {
-  border-color: var(--primary);
-}
-
-.action-select:focus {
+.slot-action-select:focus {
   outline: none;
   border-color: var(--primary);
+  box-shadow: 0 0 0 2px hsla(211, 65%, 55%, 0.15);
 }
 
-.action-dropdown-icon {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
+.slot-action-select:hover {
+  border-color: var(--primary);
+}
+
+/* Section divider */
+.slot-section-label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--muted-foreground);
-  pointer-events: none;
+  padding: var(--spacing-md) 0 var(--spacing-xs) var(--spacing-xs);
+  border-bottom: 2px solid var(--border);
+  margin-top: var(--spacing-sm);
 }
 
+.slot-section-label:first-child {
+  margin-top: 0;
+}
+
+/* Empty state */
 .table-empty {
   padding: var(--spacing-2xl);
   text-align: center;
   color: var(--muted-foreground);
+  font-size: var(--text-sm);
 }
 
-/* Empty State */
+/* Empty State (no lots) */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -469,15 +438,13 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .lot-selector-buttons {
-    grid-template-columns: 1fr;
+  .slots-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 }
 
@@ -493,14 +460,29 @@
 
   .filters-card {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .filter-dropdown {
     width: 100%;
   }
 
-  .slots-table th:nth-child(4),
-  .slots-table td:nth-child(4) {
-    display: none;
+  .slots-grid-container {
+    padding: var(--spacing-sm);
+  }
+
+  .slot-card {
+    /* Stack elements on mobile */
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: var(--spacing-sm);
+  }
+
+  .slot-vehicle {
+    grid-column: 1 / -1; /* Spans full width on mobile */
+  }
+
+  .slot-action-select {
+    grid-column: 1 / -1; /* Dropdown spans full width on mobile */
   }
 }
