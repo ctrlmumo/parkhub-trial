@@ -275,6 +275,25 @@ class AdminDashboardViewSet(viewsets.ViewSet):
             'occupancyRate': occupancy_rate
         })
 
+    @action(detail=False, methods=['patch', 'delete'], url_path=r'users/(?P<user_id>\d+)')
+    def manage_user(self, request, user_id=None):
+        try:
+            user_obj = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.method == 'PATCH':
+            new_status = request.data.get('status')
+            if new_status:
+                user_obj.status = new_status
+                user_obj.save()
+                return Response({'message': f'User {user_obj.username} status updated to {new_status}'})
+            return Response({'error': 'No status provided'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        elif request.method == 'DELETE':
+            user_obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=False, methods=['get'], url_path='audit-logs')
     def audit_logs(self, request):
         logs = AuditLog.objects.all().order_by('-created_at')

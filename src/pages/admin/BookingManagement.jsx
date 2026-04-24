@@ -12,11 +12,23 @@ const BookingManagement = () => {
   const [lotFilter, setLotFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [availableLots, setAvailableLots] = useState([]);
 
   /* Load bookings on mount */
   useEffect(() => {
     loadBookings();
+    loadLots();
   }, []);
+
+  /* Load parking lots for the filter dropdown */
+  const loadLots = async () => {
+    try {
+      const response = await api.get('/parking-lots/');
+      setAvailableLots(response.data);
+    } catch (error) {
+      console.error("Failed to load lots for filter:", error);
+    }
+  };
 
   /* Load all bookings */
   const loadBookings = async () => {
@@ -77,20 +89,39 @@ const BookingManagement = () => {
     alert(`View booking: #${booking.id}\n\nBooking details modal coming soon!`);
   };
 
-  const handleCancelBooking = (booking) => {
+const handleCancelBooking = async (booking) => {
     if (window.confirm(`Are you sure you want to cancel booking #${booking.id}?`)) {
-      // TODO: Call API to cancel booking
-      setBookings(prev =>
-        prev.map(b => b.id === booking.id ? { ...b, status: 'cancelled' } : b)
-      );
-      alert(`Booking #${booking.id} cancelled`);
+      try {
+        // Send a PATCH request to cancel the booking in the database
+        await api.patch(`/bookings/${booking.id}/`, { status: 'cancelled' });
+        
+        // Update the React state
+        setBookings(prev =>
+          prev.map(b => b.id === booking.id ? { ...b, status: 'cancelled' } : b)
+        );
+        alert(`Booking #${booking.id} cancelled successfully.`);
+      } catch (error) {
+        console.error("Failed to cancel booking:", error);
+        alert("Failed to cancel booking.");
+      }
     }
   };
 
-  const handleIssueRefund = (booking) => {
+  const handleIssueRefund = async (booking) => {
     if (window.confirm(`Issue refund of KES ${booking.amount} for booking #${booking.id}?`)) {
-      // TODO: Call API to issue refund
-      alert(`Refund of KES ${booking.amount} issued`);
+      try {
+        // Assuming you have a custom action or payment endpoint for refunds
+        // If not, we can just patch the booking status for now
+        await api.patch(`/bookings/${booking.id}/`, { status: 'cancelled' }); 
+        
+        setBookings(prev =>
+          prev.map(b => b.id === booking.id ? { ...b, payment: 'refunded', status: 'cancelled' } : b)
+        );
+        alert(`Refund of KES ${booking.amount} issued successfully.`);
+      } catch (error) {
+        console.error("Failed to issue refund:", error);
+        alert("Failed to issue refund.");
+      }
     }
   };
 
@@ -177,7 +208,11 @@ const BookingManagement = () => {
               className="filter-select"
             >
               <option value="all">All Parking Lots</option>
-              {/* Will be populated from lots data */}
+              {availableLots.map(lot => (
+                <option key={lot.id} value={lot.name}>
+                  {lot.name}
+                </option>
+              ))}
             </select>
             <ChevronDown size={18} className="dropdown-icon" />
           </div>

@@ -69,17 +69,30 @@ const UserManagement = () => {
     alert(`Edit user: ${user.name}\n\nEdit user modal coming soon!`);
   };
 
-  const handleBanUser = (user) => {
+const handleBanUser = async (user) => {
     if (window.confirm(`Are you sure you want to ban ${user.name}?`)) {
-      // TODO: Call API to ban user
-      alert(`User ${user.name} banned`);
+      try {
+        await api.patch(`/admin/users/${user.id}/`, { status: 'banned' });
+        
+        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, status: 'banned' } : u));
+        alert(`User ${user.name} banned successfully.`);
+      } catch (error) {
+        console.error("Failed to ban user:", error);
+        alert("Failed to ban user. Check backend configuration.");
+      }
     }
   };
 
-  const handleDeleteUser = (user) => {
+  const handleDeleteUser = async (user) => {
     if (window.confirm(`Are you sure you want to delete ${user.name}?\n\nThis action cannot be undone.`)) {
-      // TODO: Call API to delete user
-      setUsers(prev => prev.filter(u => u.id !== user.id));
+      try {
+        await api.delete(`/admin/users/${user.id}/`);
+        
+        setUsers(prev => prev.filter(u => u.id !== user.id));
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+        alert("Failed to delete user. They might have dependent records.");
+      }
     }
   };
 
