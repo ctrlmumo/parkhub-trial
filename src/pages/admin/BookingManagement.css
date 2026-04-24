@@ -12,7 +12,70 @@
   gap: var(--spacing-xl);
 }
 
-/* Reuse page header, filters, and table base styles from UserManagement.css */
+/*re-use styling for uniformity*/
+@import './UserManagement.css';
+.bookings-table-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-lg);
+}
+
+.bookings-table-card .table-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  background-color: var(--card);
+}
+
+.bookings-table-card .table-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.bookings-table th {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.bookings-table td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.bookings-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.bookings-table tbody tr:hover {
+  background-color: var(--muted);
+}
+
+.bookings-table tbody tr:last-child td {
+  border-bottom: none;
+}
 
 /* BOOKING-SPECIFIC STYLES */
 
@@ -134,6 +197,3 @@
   background: hsl(0, 40%, 15%);
   color: hsl(0, 60%, 70%);
 }
-
-/* Import shared styles from UserManagement */
-@import url('./UserManagement.css');
