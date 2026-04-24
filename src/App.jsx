@@ -128,7 +128,7 @@ function App() {
           />
 
           <Route
-            path="/admin/user-management"
+            path="/admin/users"
             element={
               <ProtectedRoute adminOnly>
                 <UserManagement />
@@ -137,7 +137,7 @@ function App() {
           />
 
           <Route
-            path="/admin/booking-management"
+            path="/admin/bookings"
             element={
               <ProtectedRoute adminOnly>
                 <BookingManagement />
