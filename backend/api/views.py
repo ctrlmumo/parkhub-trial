@@ -38,6 +38,13 @@ class AuthViewSet(viewsets.ViewSet):
         if user and user.check_password(password):
             if user.status != 'active':
                  return Response({'error': 'Account is not active'}, status=status.HTTP_403_FORBIDDEN)
+
+            AuditLog.objects.create( #record login activity
+                user=user, 
+                action="USER_LOGIN",
+                entity_type="User",
+                entity_id=user.id
+            )
                  
             refresh = RefreshToken.for_user(user)
             serializer = UserSerializer(user)
@@ -55,6 +62,14 @@ class AuthViewSet(viewsets.ViewSet):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+
+            AuditLog.objects.create( #record sign up
+                user=user, 
+                action="USER_REGISTER",
+                entity_type="User",
+                entity_id=user.id
+            )
+
             refresh = RefreshToken.for_user(user)
             return Response({
                 'token': str(refresh.access_token),
@@ -81,7 +96,14 @@ class ParkingLotViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(manager=self.request.user)
+        lot = serializer.save(manager=self.request.user)
+
+        AuditLog.objects.create(
+            user=self.request.user, #record creating a lot in the recent activity log in admin
+            action="CREATE_PARKING_LOT",
+            entity_type="ParkingLot",
+            entity_id=lot.id,
+        )
 
     def get_queryset(self):
         queryset = ParkingLot.objects.all()
@@ -106,6 +128,16 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        booking = serializer.save()
+        
+        AuditLog.objects.create(
+            user=self.request.user, #record booking
+            action="CREATED_BOOKING",
+            entity_type="Booking",
+            entity_id=booking.id
+        )
 
     def get_queryset(self):
         user = self.request.user
@@ -287,10 +319,31 @@ class AdminDashboardViewSet(viewsets.ViewSet):
             if new_status:
                 user_obj.status = new_status
                 user_obj.save()
+
+                if new_status == 'banned':
+                    action_type = "BANNED_USER"
+                elif new_status == 'active':
+                    action_type = "UNBANNED_USER"
+                else:
+                    action_type = "UPDATE_USER"
+
+                AuditLog.objects.create(
+                    user=request.user,
+                    action=action_type,
+                    entity_type="User",
+                    entity_id=user_obj.id,
+                )
+
                 return Response({'message': f'User {user_obj.username} status updated to {new_status}'})
             return Response({'error': 'No status provided'}, status=status.HTTP_400_BAD_REQUEST)
             
         elif request.method == 'DELETE':
+            AuditLog.objects.create(
+                user=request.user,
+                action="DELETE_USER",
+                entity_type="User",
+                entity_id=user_obj.id,
+            )
             user_obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 

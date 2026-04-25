@@ -57,15 +57,33 @@ const AdminDashboard = () => {
 
       // Handle Activity Response
       if (activityResult.status === 'fulfilled' && activityResult.value.data && Array.isArray(activityResult.value.data.results)) {
-        const transformedActivity = activityResult.value.data.results.map(log => ({
-          id: log.id,
-          time: formatDateTime(log.created_at),
-          user: log.user?.username || 'System',
-          action: log.action ? capitalize(log.action.toLowerCase().replace(/_/g, ' ')) : 'Unknown',
-          actionType: log.action ? log.action.toLowerCase().split('_')[0] : 'info',
-          entity: log.entity_type || 'N/A',
-          details: `${log.entity_type || ''} ID: ${log.entity_id || ''}`.trim()
-        }));
+        const transformedActivity = activityResult.value.data.results.map(log => {
+          
+          // Make the action string highly readable with custom badge colors
+          let actionText = log.action;
+          let actionClass = 'info';
+
+          if (log.action === 'BANNED_USER') { actionText = 'Banned User'; actionClass = 'warning'; }
+          else if (log.action === 'UNBANNED_USER') { actionText = 'Unbanned User'; actionClass = 'success'; }
+          else if (log.action === 'DELETE_USER') { actionText = 'Deleted User'; actionClass = 'danger'; }
+          else if (log.action === 'CREATE_PARKING_LOT') { actionText = 'Created Lot'; actionClass = 'primary'; }
+          else if (log.action === 'USER_REGISTER') { actionText = 'New Sign Up'; actionClass = 'success'; }
+          else if (log.action === 'USER_LOGIN') { actionText = 'Logged In'; actionClass = 'info'; }
+          else if (log.action === 'CREATED_BOOKING') { actionText = 'Booked Slot'; actionClass = 'primary'; }
+          else {
+            actionText = log.action ? capitalize(log.action.toLowerCase().replace(/_/g, ' ')) : 'Unknown';
+            actionClass = log.action ? log.action.toLowerCase().split('_')[0] : 'info';
+          }
+
+          return {
+            id: log.id,
+            time: formatDateTime(log.created_at),
+            admin: log.user_details?.username || 'System',
+            action: actionText,
+            actionType: actionClass,
+            target: log.target_name || `${log.entity_type} #${log.entity_id}` // Use new backend field!
+          };
+        });
         setRecentActivity(transformedActivity);
       } else {
         console.error("Failed to load recent activity:", activityResult.reason);
@@ -240,24 +258,26 @@ const AdminDashboard = () => {
                   <thead>
                     <tr>
                       <th>Time</th>
-                      <th>User</th>
-                      <th>Action</th>
-                      <th>Entity</th>
-                      <th>Details</th>
+                      <th>Admin</th>
+                      <th>Activity</th>
+                      <th>Target (User/Lot)</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentActivity.map((activity) => (
                       <tr key={activity.id}>
                         <td>{activity.time}</td>
-                        <td>{activity.user}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--foreground)' }}>
+                          {activity.admin}
+                        </td>
                         <td>
                           <span className={`action-badge action-${activity.actionType}`}>
                             {activity.action}
                           </span>
                         </td>
-                        <td>{activity.entity}</td>
-                        <td className="activity-details">{activity.details}</td>
+                        <td className="activity-details">
+                          {activity.target}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -67,6 +67,22 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class AuditLogSerializer(serializers.ModelSerializer):
     user_details = UserSerializer(source='user', read_only=True)
+    target_name = serializers.SerializerMethodField()
     class Meta:
         model = AuditLog
         fields = '__all__'
+
+    def get_target_name(self, obj):
+        try:
+            if obj.entity_type == 'User':
+                target = User.objects.get(id=obj.entity_id)
+                return target.username
+            elif obj.entity_type == 'ParkingLot':
+                target = ParkingLot.objects.get(id=obj.entity_id)
+                return target.name
+            elif obj.entity_type == 'Booking':
+                return f"Booking #{obj.entity_id}"
+        except Exception:
+            # If the user or lot was permanently deleted, we just label it as deleted
+            return f"Deleted {obj.entity_type}"
+        return None
