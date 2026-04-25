@@ -518,7 +518,8 @@ const FindParking = () => {
                   isSelected={selectedLotId === lot.id}
                   onHover={handleLotHover}
                   onLeave={handleLotLeave}
-                  onClick={handleLotClick}
+                  onClick={handleMarkerClick}
+                  onBookClick={handleLotClick}
                 />
               ))
             )}

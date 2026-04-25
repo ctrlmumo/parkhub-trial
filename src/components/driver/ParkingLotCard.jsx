@@ -8,7 +8,8 @@ const ParkingLotCard = ({
   isSelected,
   onHover, 
   onLeave, 
-  onClick 
+  onClick,
+  onBookClick
 }) => {
   
   /* Get availability status and color */
@@ -68,16 +69,9 @@ const ParkingLotCard = ({
       className={`parking-lot-card ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
       onMouseEnter={() => onHover(lot.id)}
       onMouseLeave={onLeave}
-      onClick={() => navigate(`/driver/lot/${lot.id}`)}
+      onClick={() => onClick(lot.id)}
     >
-      {/* Header: Category Badge */}
-      <div className="lot-card-header">
-        <div className="category-badge">
-          <span>{categoryBadge.icon}</span>
-          <span>{categoryBadge.label}</span>
-        </div>
-      </div>
-      
+
       {/* Title */}
       <h3 className="lot-card-title">{lot.name}</h3>
       
@@ -116,12 +110,6 @@ const ParkingLotCard = ({
           <span className="meta-label">💰</span>
           <span className="meta-value">KES {lot.hourlyRate}/hour</span>
         </div>
-        <div className="meta-item">
-          <Star size={14} fill="currentColor" />
-          <span className="meta-value">
-            {lot.rating} ({lot.reviewCount} reviews)
-          </span>
-        </div>
       </div>
       
       {/* Amenities */}
@@ -152,6 +140,10 @@ const ParkingLotCard = ({
         fullWidth
         icon={<Navigation2 size={16} />}
         className="lot-cta-btn"
+        onClick={(e) => {
+          e.stopPropagation(); // Prevents the map-zoom click from firing
+          onBookClick(lot.id); // Triggers the redirect
+        }}
       >
         View Slots & Book
       </Button>
