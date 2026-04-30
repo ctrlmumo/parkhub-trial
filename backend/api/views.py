@@ -139,6 +139,14 @@ class BookingViewSet(viewsets.ModelViewSet):
             entity_id=booking.id
         )
 
+        Payment.objects.create(
+            booking=booking,
+            amount=booking.total_amount,
+            payment_method='mpesa',
+            status='completed',
+            transaction_id=f"MOCK_{booking.booking_reference}" # flags as a mock transaction
+        )
+
     def get_queryset(self):
         user = self.request.user
         now = timezone.now()
@@ -238,16 +246,32 @@ class DashboardViewSet(viewsets.ViewSet):
                 'time': b.created_at.strftime('%I:%M %p')
             })
 
-        # 8. Weekly Occupancy (Mocked trend based on booking count)
+        # 8. True Weekly Occupancy (Calculated dynamically)
         occupancy_data = []
         last_7_days = [today - datetime.timedelta(days=i) for i in range(6, -1, -1)]
+        # Convert total capacity into available hours per day
+        total_daily_capacity_hours = total_slots * 24
+        
         for day in last_7_days:
-            count = Booking.objects.filter(
+            # Safely handle brand new managers with no parking lots
+            if total_daily_capacity_hours == 0:
+                occupancy_data.append({
+                    'day': day.strftime('%a'),
+                    'rate': 0
+                })
+                continue
+                
+            # Sum the exact duration of all bookings for manager's lots
+            daily_booked_hours = Booking.objects.filter(
                 parking_slot__parking_lot__in=lots,
-                created_at__date=day
-            ).count()
-            # Simple heuristic: assume 1 booking = 5% occupancy for visualization
-            rate = min((count * 5), 100) 
+                start_time__date=day,
+                status__in=['active', 'completed']
+            ).aggregate(total_hours=Sum('duration_hours'))['total_hours'] or 0
+            
+            # Calculate true percentage and cap at 100
+            rate = round((daily_booked_hours / total_daily_capacity_hours) * 100, 1)
+            rate = min(rate, 100.0)
+            
             occupancy_data.append({
                 'day': day.strftime('%a'),
                 'rate': rate
@@ -425,6 +449,8 @@ class AdminDashboardViewSet(viewsets.ViewSet):
             hour_counts[h] = hour_counts.get(h, 0) + 1
 
         return Response([{'hour': f"{h:02d}:00", 'bookings': c} for h, c in sorted(hour_counts.items())])
+
+    
 
     @action(detail=False, methods=['get'], url_path='analytics/user-activity')
     def user_activity(self, request):

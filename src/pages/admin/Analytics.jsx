@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { 
   CircleDollarSign, 
   TrendingUp,
@@ -100,17 +102,46 @@ const Analytics = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  /* Export handlers */
+  /* Export handlers (Frontend Generation) */
   const handleExport = async (format) => {
     if (isExporting) return;
     setIsExporting(true);
-    const fileExtension = format === 'pdf' ? 'pdf' : 'xlsx';
+
     try {
-      const response = await api.get(`/admin/export-analytics/?format=${fileExtension}`, {
-        responseType: 'blob',
-      });
-      const filename = `parkhub_analytics_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
-      downloadFile(response.data, filename);
+      const dateStr = new Date().toISOString().slice(0, 10);
+
+      if (format === 'pdf') {
+        // screenshot of the dashboard
+        const dashboardElement = document.querySelector('.analytics-container');
+        const canvas = await html2canvas(dashboardElement, { 
+          scale: 2,
+          useCORS: true 
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Platform_Analytics_${dateStr}.pdf`);
+
+      } else if (format === 'excel') {
+        if (revenueData.length === 0) return alert("No data to export!");
+        
+        const headers = ['Date', 'Revenue (KES)'];
+        const csvRows = revenueData.map(d => `${d.date},${d.revenue}`);
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute('download', `Revenue_Data_${dateStr}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     } catch (error) {
       console.error(`Error exporting to ${format.toUpperCase()}:`, error);
       alert(`Failed to generate ${format.toUpperCase()} report. Please try again.`);
