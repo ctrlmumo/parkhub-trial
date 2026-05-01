@@ -1,16 +1,18 @@
-# backend/parkhub_backend/settings.py
-
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_path = BASE_DIR / '.env'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-replace-this-with-a-secure-key-in-production'
+load_dotenv(env_path)
 
-# SECURITY WARNING: don't run with debug turned on in production!
+PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY')
+
+
+SECRET_KEY = 'replace-with-a-secure-key-in-production'
+
 DEBUG = True
 
 ALLOWED_HOSTS = []

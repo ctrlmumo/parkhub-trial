@@ -1,3 +1,4 @@
+from os import environ
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -8,6 +9,9 @@ from django.db.models.functions import TruncHour, TruncDate
 from django.utils import timezone
 from rest_framework.pagination import PageNumberPagination
 from django.http import HttpResponse
+from django.conf import settings
+from rest_framework.exceptions import ValidationError
+import requests
 import csv
 import datetime
 from .models import ParkingLot, ParkingSlot, Booking, Payment, AuditLog
@@ -130,21 +134,41 @@ class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
+     # 1. Fetch the data
+        paystack_ref = self.request.data.get('paystack_reference')
+        if not paystack_ref:
+            raise ValidationError({"error": "Payment reference is required."})
+
+        # 2. Securely talk to Paystack
+        headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}"}
+        url = f"https://api.paystack.co/transaction/verify/{paystack_ref}"
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            paystack_data = response.json()
+        except Exception as e:
+            print("--- REQUESTS CRASH ---", e)
+            raise ValidationError({"error": "Internet connection to Paystack failed."})
+
+        # 3. Print the REAL response to your terminal so we can see it!
+        print("--- PAYSTACK SAID: ---", paystack_data)
+
+        # 4. Check if Paystack approved the transaction
+        if paystack_data.get('status') is False:
+            # This catches "Invalid key", "Transaction not found", etc.
+            raise ValidationError({"error": f"Paystack Error: {paystack_data.get('message')}"})
+            
+        if paystack_data.get('data', {}).get('status') != 'success':
+            raise ValidationError({"error": "Payment was not successful."})
+            
         booking = serializer.save()
         
-        AuditLog.objects.create(
-            user=self.request.user, #record booking
-            action="CREATED_BOOKING",
-            entity_type="Booking",
-            entity_id=booking.id
-        )
-
         Payment.objects.create(
             booking=booking,
             amount=booking.total_amount,
-            payment_method='mpesa',
+            payment_method='paystack',
             status='completed',
-            transaction_id=f"MOCK_{booking.booking_reference}" # flags as a mock transaction
+            transaction_id=paystack_ref
         )
 
     def get_queryset(self):

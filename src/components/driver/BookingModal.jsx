@@ -5,8 +5,9 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import Button from '../common/Button';
 import Input from '../common/Input';
-import { DURATION_OPTIONS, HOURLY_RATE } from '../../utils/constants';
+import { DURATION_OPTIONS } from '../../utils/constants';
 import { formatPrice } from '../../utils/helpers';
+import { PaystackButton } from 'react-paystack'; 
 import './BookingModal.css';
 
 const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
@@ -47,7 +48,6 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -71,32 +71,29 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  /* Handle next step */
+  /* Handle next/back steps */
   const handleNext = () => {
-    if (step === 1) {
-      if (validateStep1()) {
-        setStep(2);
-      }
+    if (step === 1 && validateStep1()) {
+      setStep(2);
     } else if (step === 2) {
       setStep(3);
     }
   };
 
-  /* Handle back step */
   const handleBack = () => {
     if (step > 1 && step < 4) {
       setStep(step - 1);
     }
   };
 
-  /* Simulate M-Pesa payment */
-  const handlePayment = async () => {
+  /* --- PAYSTACK INTEGRATION --- */
+  
+  // 1. Handle successful payment
+  const onPaystackSuccess = async (reference) => {
+    console.log("PAYSTACK SUCCESS FIRED! Here is the data:", reference);
     setPaymentLoading(true);
-    
     try {
-      const ref = `PH${Date.now().toString().slice(-8)}`;
-      
-      // 1. Create the booking in the database
+      // Create the booking in the database using the real Paystack reference
       const payload = {
         user: user.id,
         parking_slot: slot.id,
@@ -106,28 +103,46 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
         vehicle_number: formData.vehicleNumber,
         hourly_rate: hourlyRate,
         total_amount: calculateCost(),
-        booking_reference: ref,
+        booking_reference: reference.reference, // making sure both reference fields are sent
+        paystack_reference: reference.reference, 
         status: 'active'
       };
       
       await api.post('/bookings/', payload);
       
-      // 2. Update the slot status to occupied
+      // Update the slot status to occupied
       await api.patch(`/parking-slots/${slot.id}/`, {
         status: 'occupied'
       });
 
-      setBookingReference(ref);
-      setStep(4);
+      setBookingReference(reference.reference);
+      setStep(4); // Move to Success Screen
     } catch (error) {
       console.error("Booking failed:", error);
-      alert("Booking failed. Ensure the slot is still available.");
+      alert("Payment was successful, but the booking failed.");
     } finally {
       setPaymentLoading(false);
     }
   };
 
-  /* Handle booking completion */
+  // 2. Handle popup close
+  const onPaystackClose = () => {
+    setPaymentLoading(false);
+    console.log("User closed the payment popup");
+  };
+
+  // 3. Component Props for the Button
+  const componentProps = {
+    email: user?.email || 'driver@parkhub.com',
+    amount: calculateCost() * 100, // IMPORTANT: Paystack uses cents!
+    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+    currency: 'KES',
+    text: "Pay with Paystack",
+    onSuccess: (reference) => onPaystackSuccess(reference),
+    onClose: onPaystackClose,
+  };
+
+  /* Handle booking completion (Close Modal) */
   const handleComplete = () => {
     const booking = {
       id: bookingReference,
@@ -141,7 +156,6 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
         name: 'Main Campus Lot'
       }
     };
-    
     onComplete(booking);
   };
 
@@ -207,14 +221,14 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
                 />
 
                 <Input
-                  label="M-Pesa Phone Number"
+                  label="Phone Number"
                   type="tel"
                   name="phoneNumber"
                   placeholder="254712345678"
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   error={errors.phoneNumber}
-                  hint="We'll send payment prompt to this number"
+                  hint="For booking updates and receipts"
                   required
                 />
               </div>
@@ -297,14 +311,13 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
             <div className="step-content">
               <div className="step-header">
                 <CreditCard className="step-icon" />
-                <h2 className="step-title">M-Pesa Payment</h2>
+                <h2 className="step-title">Secure Checkout</h2>
                 <p className="step-subtitle">
                   Confirm payment of {formatPrice(calculateCost())}
                 </p>
               </div>
 
               <div className="payment-card">
-                <div className="mpesa-logo">M-PESA</div>
                 <div className="payment-details">
                   <div className="payment-row">
                     <span>Phone Number:</span>
@@ -316,7 +329,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
                   </div>
                 </div>
                 <p className="payment-note">
-                  You'll receive a payment prompt on your phone. Enter your M-Pesa PIN to complete.
+                  Click below to open the secure payment gateway. You can use a test card.
                 </p>
               </div>
 
@@ -324,14 +337,30 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
                 <Button variant="outline" onClick={handleBack} disabled={paymentLoading}>
                   Back
                 </Button>
-                <Button
-                  variant="success"
-                  onClick={handlePayment}
-                  loading={paymentLoading}
-                  icon={<CreditCard size={18} />}
-                >
-                  {paymentLoading ? 'Processing...' : 'Confirm Payment'}
-                </Button>
+                
+                {paymentLoading ? (
+                  <Button variant="success" disabled loading={true}>Processing...</Button>
+                ) : (
+                  <PaystackButton 
+                    {...componentProps} 
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: 'var(--radius)',
+                      border: 'none',
+                      backgroundColor: 'hsl(142, 70%, 50%)',
+                      color: 'white',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      fontSize: 'var(--text-sm)',
+                      transition: 'all 0.2s'
+                    }}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -376,7 +405,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
                 </div>
 
                 <p className="success-note">
-                  A confirmation SMS has been sent to {formData.phoneNumber}
+                  A confirmation receipt has been sent to {formData.phoneNumber}
                 </p>
               </div>
 
