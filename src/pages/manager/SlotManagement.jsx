@@ -7,12 +7,15 @@ import ManagerNavbar from '../../components/manager/ManagerNavbar';
 import CreateLotModal from '../../components/manager/CreateLotModal';
 import ParkingLotCard from '../../components/manager/ParkingLotCard';
 import './SlotManagement.css';
+import EditLotModal from '../../components/manager/EditLotModal';
 
 const SlotManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [parkingLots, setParkingLots] = useState([]);
   const [selectedLot, setSelectedLot] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [lotToEdit, setLotToEdit] = useState(null);
   const [slots, setSlots] = useState([]);
   const [filteredSlots, setFilteredSlots] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,7 +69,17 @@ const SlotManagement = () => {
   };
 
   const handleEditLot = (lot) => {
-    alert(`Edit lot: ${lot.name}\n\nEdit modal coming soon!`);
+    setLotToEdit(lot);
+    setShowEditModal(true);
+  };
+
+  const handleLotEdited = (updatedLot) => {
+      setParkingLots(prev => 
+          prev.map(lot => lot.id === updatedLot.id ? updatedLot : lot)
+      );
+      if (selectedLot?.id === updatedLot.id) {
+          setSelectedLot(updatedLot);
+      }
   };
 
   const handleDeleteLot = async (lot) => {
@@ -384,6 +397,19 @@ const SlotManagement = () => {
         <CreateLotModal
           onClose={() => setShowCreateModal(false)}
           onLotCreated={handleLotCreated}
+        />
+      )}
+
+      {/* Edit Lot Modal */}
+      {showEditModal && (
+        <EditLotModal
+          isOpen={showEditModal}
+          onClose={() => {
+              setShowEditModal(false);
+              setLotToEdit(null);
+          }}
+          lot={lotToEdit}
+          onLotUpdated={handleLotEdited} 
         />
       )}
     </div>

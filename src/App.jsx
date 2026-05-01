@@ -1,11 +1,10 @@
-/* Sets up routing and provides the main app structure */
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Map from './components/driver/Map';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import DriverProfile from './pages/driver/DriverProfile';
 import DriverDashboard from './pages/driver/Dashboard';
 import FindParking from './pages/driver/FindParking';
 import LotDetail from './pages/driver/LotDetail';
@@ -74,6 +73,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <DriverDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/driver/profile"
+            element={
+              <ProtectedRoute>
+                <DriverProfile />
               </ProtectedRoute>
             }
           />
