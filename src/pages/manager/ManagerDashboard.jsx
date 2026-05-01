@@ -45,17 +45,11 @@ const ManagerDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const bookingsPerPage = 5;
 
-  /**
-   * Load dashboard data
-   */
+  /* Load dashboard data */
   useEffect(() => {
     loadDashboardData();
   }, []);
 
-  /**
-   * Load all dashboard data
-   * TODO: Replace with API calls
-   */
   const loadDashboardData = async () => {
     try {
       const response = await api.get('/dashboard/manager/');
@@ -71,9 +65,7 @@ const ManagerDashboard = () => {
     }
   };
 
-  /**
-   * Get paginated bookings
-   */
+  /* Get paginated bookings */
   const getPaginatedBookings = () => {
     const startIndex = (currentPage - 1) * bookingsPerPage;
     const endIndex = startIndex + bookingsPerPage;
@@ -82,9 +74,7 @@ const ManagerDashboard = () => {
 
   const totalPages = Math.ceil(recentBookings.length / bookingsPerPage);
 
-  /**
-   * Custom tooltip for charts
-   */
+  /* Custom tooltip for charts */
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -111,10 +101,6 @@ const ManagerDashboard = () => {
           <div className="header-content">
             <h1 className="dashboard-title">Manager Dashboard</h1>
             <p className="dashboard-subtitle">Welcome back, Manager</p>
-          </div>
-          <div className="status-pill">
-            <span className="status-dot"></span>
-            <span className="status-text">System Online</span>
           </div>
         </div>
 
