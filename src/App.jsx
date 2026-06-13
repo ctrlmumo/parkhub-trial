@@ -14,6 +14,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import BookingManagement from './pages/admin/BookingManagement';
 import Analytics from './pages/admin/Analytics';
+import LotManagement from './pages/admin/LotManagement';
 
 
 /* Redirects to dashboard if already logged in */
@@ -142,6 +143,15 @@ function App() {
                 <UserManagement />
               </ProtectedRoute>
             }
+          />
+
+          <Route
+          path="/admin/lots"
+          element={
+            <ProtectedRoute adminOnly>
+              <LotManagement />
+            </ProtectedRoute>
+          }
           />
 
           <Route

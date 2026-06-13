@@ -5,11 +5,18 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
+    """ Custom User model extending Django's built-in AbstractUser.
+    This model serves as the central authentication and authorization entity 
+    for the ParkHub Allocation System, securely managing drivers, managers, and admins. """
+
+    # Define role-based access control (RBAC) tiers
     ROLE_CHOICES = (
         ('driver', 'Driver'),
         ('manager', 'Manager'),
         ('admin', 'Admin'),
     )
+
+    # Define account lifecycle states for administrative control
     STATUS_CHOICES = (
         ('active', 'Active'),
         ('banned', 'Banned'),
