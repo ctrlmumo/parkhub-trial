@@ -126,7 +126,7 @@ const BookingModal = ({ slot, isOpen, onClose, onComplete, hourlyRate }) => {
   };
 
   // 2. Handle popup close
-  const onPaystackClose = () => {
+  const onPaystackClose = () => { 
     setPaymentLoading(false);
     console.log("User closed the payment popup");
   };
